@@ -1,0 +1,32 @@
+# Base image
+FROM node:23-alpine3.20 AS base
+
+# Install necessary packages
+RUN apk add --no-cache libc6-compat git wget
+
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY package.json package-lock.* ./
+RUN npm install --frozen-lockfile --prefer-frozen-lockfile
+
+# Install Prisma CLI globally to handle client generation
+RUN npm install -g prisma
+COPY prisma ./prisma
+
+RUN npx prisma generate
+
+# Set environment for development
+ENV NODE_ENV development
+
+# Copy the rest of the application
+COPY . .
+
+
+# Expose the port for development
+EXPOSE 8000
+ENV PORT 8000
+ENV HOSTNAME "0.0.0.0"
+
+# Start the application in development mode
+CMD ["npm", "run", "dev"]
