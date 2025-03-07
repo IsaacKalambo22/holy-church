@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const transaction_1 = require("../../controllers/transaction");
+const verify_token_1 = require("../../middlewares/verify-token");
+const router = (0, express_1.Router)();
+router.get('/', transaction_1.listTransactions);
+router.post('/', verify_token_1.verifyToken, transaction_1.createTransaction);
+router.post('/stripe/payment-intent', transaction_1.createStripePaymentIntent);
+exports.default = router;
