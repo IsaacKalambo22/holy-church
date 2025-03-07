@@ -45,14 +45,14 @@ const Testimonial = () => {
   return (
     <div className='flex flex-col items-center gap-8 w-full'>
       <h2 className='blue_gradient text-3xl font-bold'>
-        Testimonials
+        Testimonies
       </h2>
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 w-full mt-4'>
         {testimonials.map(
           (testimonial, index) => (
             <Card
               key={index}
-              className='flex flex-col sm:flex-row items-center gap-4 bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 border border-amber-600'
+              className='flex flex-col sm:flex-row items-center gap-4 bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 border border-orange-700'
             >
               <Avatar className='h-20 w-20 rounded-full'>
                 {testimonial.imageUrl && (

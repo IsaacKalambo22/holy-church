@@ -1,8 +1,6 @@
-import FrequentlyAskedQuestions from './frequently-asked-questions';
 import HomeGallery from './home-gallery';
 import { MainCarousel } from './main-carousel';
 import MotionImageText from './motion-image-text';
-import OurTeam from './our-team';
 import HomeServices from './services';
 import Testimonial from './testimonial';
 
@@ -11,22 +9,22 @@ export const homeData = [
     imagePath: '/assets/images/carousel/4.jpg',
     title: 'Who we are',
     description:
-      'We are a transformative training institution focused on equipping individuals with self-manifestation principles to overcome identity confusion—a major contributor to unemployment.',
+      'We are a body known as Holy Church Assembly, A gathering of believers, fellowshipping together, located in Mthatha, Eastern Cape.',
   },
   {
     imagePath: '/assets/images/carousel/5.jpg',
     title: 'Our Vision',
-    description: `To develop individuals' aptitudes with sound mindsets and empowering health messages, enabling them to become agents of effective influence globally`,
+    description: `Our vision is to raise a generation that will be baptized in the Holy Spirit, Purified with the flames of fire and represent Jesus Christ with no fear until His Glory appears. (1 Corinthians 9:19-23) and teach this generation how to flow in the Anointing of Jesus Christ and in His power.`,
   },
   {
     imagePath: '/assets/images/carousel/6.jpg',
     title: 'Our Mission',
-    description: `To create strategic platforms and foster meaningful connections that empower individual's  unique aptitudes to navigate the world with purpose and influence.`,
+    description: `Our mission is to make passionately devoted followers of Jesus Christ in Grace and Power. (Matthew 28:19-20)`,
   },
   {
     imagePath: '/assets/images/carousel/8.jpg',
-    title: 'Our Goal',
-    description: `Identifying and developing individual's exceptional talents, equipping them with the resources and support needed by ensuring that they are strategically prepared for maximum impact before being introduced to the market`,
+    title: 'Values',
+    description: `A PASSION FOR JESUS CHRIST Foremost in the life of our church is a passion for Jesus Christ manifested by an adherence to God’s Word and a dependence on the Holy Spirit’s empowering presence. (John 14:23-26)`,
   },
   
 ];
@@ -46,15 +44,7 @@ const Home = () => {
       <HomeGallery />
 
       <Testimonial />
-      {/* <InfiniteMovingCards
-        items={testimonials}
-        direction='left'
-        speed='slow'
-      /> */}
-
-      <OurTeam />
-
-      <FrequentlyAskedQuestions />
+      {/* <OurTeam /> */}
     </div>
   );
 };

@@ -21,8 +21,8 @@ const Footer = () => {
             <div className='w-full'>
               <Image
                 src='/assets/images/logo.png'
-                width={60}
-                height={60}
+                width={160}
+                height={160}
                 alt='logo'
                 className='object-contain'
               />

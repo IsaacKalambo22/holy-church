@@ -36,8 +36,8 @@ const Desktop = () => {
               <div className='w-full h-full justify-center items-center'>
                 <Image
                   src='/assets/images/logo.png'
-                  width={43}
-                  height={43}
+                  width={60}
+                  height={60}
                   alt='logo'
                   className='object-contain'
                 />
@@ -45,9 +45,9 @@ const Desktop = () => {
             </Link>
             <Link
               href='/'
-              className=' bg-gradient-to-r text-amber-500 text-[1rem] leading-snug capitalize'
+              className=' bg-gradient-to-r text-orange-700 text-[1rem] leading-snug capitalize'
             >
-              Identity Impact Hub
+              Holy Church Assembly
             </Link>
           </div>
         </div>

@@ -343,9 +343,9 @@ const Mobile: React.FC = () => {
           </Link>
           <Link
             href='/'
-            className='text-amber-500 text-[1rem] leading-snug capitalize max-sm:text-[0.9rem]'
+            className='text-orange-700 text-[1rem] leading-snug capitalize max-sm:text-[0.9rem]'
           >
-            Identity Impact Hub
+            Holy Church Assembly
           </Link>
         </div>
       </motion.nav>
