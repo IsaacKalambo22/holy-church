@@ -121,11 +121,11 @@ body,
 }
 
 .blue_gradient {
-  @apply font-bold text-gray-700 bg-clip-text  text-center leading-snug capitalize text-2xl sm:text-3xl;
+  @apply font-bold text-purple-900 bg-clip-text  text-center leading-snug capitalize text-2xl sm:text-3xl;
 }
 
 .blue_subtitle {
-  @apply text-gray-600 bg-clip-text text-xl sm:text-xl leading-snug capitalize;
+  @apply text-orange-700 bg-clip-text text-xl sm:text-xl leading-snug capitalize;
 }
 
 .shad-input {

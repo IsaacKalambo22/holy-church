@@ -32,7 +32,7 @@ const Footer = () => {
             Holy Church Assembly
           </p>
           <p className='mb-4 text-gray-600 text-[.9rem] font-sans font-normal'>
-            © 2025 Identity Impact Hub
+            © 2025 Holy Church Assembly
           </p>
           <div className='flex space-x-4 mx-4'>
             <Link

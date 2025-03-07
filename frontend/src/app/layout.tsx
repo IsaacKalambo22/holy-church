@@ -45,44 +45,10 @@ const bebasNeue = localFont({
 
 export const metadata: Metadata = {
   title:
-    'Identity Impact Hub | Revealing the hidden potential',
+    'Holy Church Assembly',
   description:
-    'A global hub for thought leaders, innovators, and change-makers. Connect, collaborate, and drive meaningful impact.',
-  keywords: [
-    'Identity Impact Hub',
-    'Social Innovation',
-    'Sustainable Development',
-    'Leadership Network',
-    'Global Change-Makers',
-    'Entrepreneurship for Impact',
-    'Impact-Driven Community',
-    'Social Responsibility',
-    'Empowering Innovation',
-    'Thought Leadership',
-  ],
-  other: {
-    canonical: 'https://identityimpacthub.com',
-  },
-  openGraph: {
-    title:
-      'Identity Impact Hub | Revealing the hidden potential',
-    description:
-      'Join a vibrant network of innovators, leaders, and changemakers. Identity Impact Hub is a catalyst for social and entrepreneurial impact.',
-    url: 'https://identityimpacthub.com',
-    images: [
-      {
-        url: 'https://identityimpacthub.com/assets/images/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Identity Impact Hub - Revealing the hidden potential',
-      },
-    ],
-    type: 'website',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+    'A body known as ',
+  
 };
 
 const RootLayout = async ({

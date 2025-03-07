@@ -48,7 +48,7 @@ export default function HomeServices() {
   return (
     <div className='flex flex-col items-center gap-5 mb-10'>
       <h2 className='blue_gradient'>
-        Our Services
+        Daily Devotions
       </h2>
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto'>
         {services.map((service, index) => (
