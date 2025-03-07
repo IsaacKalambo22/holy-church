@@ -28,13 +28,13 @@ const Footer = () => {
               />
             </div>
           </Link>
-          <p className='my-4 text-gray-600 text-[.9rem] font-sans font-normal'>
-            Revealing the hidden potential
+          <p className='mx-4 my-4 text-gray-600 text-[.9rem] font-sans font-normal'>
+            Holy Church Assembly
           </p>
           <p className='mb-4 text-gray-600 text-[.9rem] font-sans font-normal'>
             © 2025 Identity Impact Hub
           </p>
-          <div className='flex space-x-4'>
+          <div className='flex space-x-4 mx-4'>
             <Link
               href='https://youtube.com/@identityimpacthubltd?si=SSj6vr-LMeVUzAU2'
               target='_blank'
