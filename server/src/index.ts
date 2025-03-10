@@ -7,7 +7,7 @@ import morgan from 'morgan';
 
 /* ROUTE IMPORTS */
 import auth from './routes/auth';
-import courses from './routes/course';
+import courses from './routes/semon';
 import gallery from './routes/gallery';
 import transactions from './routes/transaction';
 import users from './routes/user';

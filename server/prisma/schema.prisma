@@ -15,22 +15,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
+
 model User {
-  id                         String        @id @default(uuid())
-  email                      String        @unique
+  id                         String    @id @default(uuid())
+  email                      String    @unique
   password                   String?
   phoneNumber                String?
   name                       String
   avatar                     String?
   about                      String?
-  lastLogin                  DateTime      @default(now())
-  isVerified                 Boolean       @default(false)
+  role                       Role      @default(USER)
+  lastLogin                  DateTime  @default(now())
+  isVerified                 Boolean   @default(false)
   resetPasswordToken         String?
   resetPasswordExpiresAt     DateTime?
   verificationToken          String?
   verificationTokenExpiresAt DateTime?
-  createdAt                  DateTime      @default(now())
-  updatedAt                  DateTime      @updatedAt
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
 
   sermons     Sermon[]
   donations   Donation[]
@@ -67,6 +74,14 @@ model Event {
   updatedAt   DateTime @updatedAt
 }
 
+model Gallery {
+  id        String   @id @default(uuid())
+  caption   String
+  imageUrls String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Donation {
   id          String  @id @default(uuid())
   amount      Float?
@@ -98,6 +113,7 @@ model Podcast {
   id          String   @id @default(uuid())
   title       String
   description String?
+  audioUrl    String?
   videoUrl    String?
   duration    Int?      // Duration in seconds
   speaker     User?     @relation(fields: [speakerId], references: [id])
