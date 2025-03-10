@@ -15,26 +15,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  MANAGER
-  USER
-  STUDENT
-  TEACHER
-}
-
-enum AccountType {
-  SILVER
-  GOLD
-  DIAMOND
-  PRO
-}
-
-enum Gender {
-  MALE
-  FEMALE
-}
-
 model User {
   id                         String        @id @default(uuid())
   email                      String        @unique
@@ -43,7 +23,6 @@ model User {
   name                       String
   avatar                     String?
   about                      String?
-  role                       Role          @default(USER)
   lastLogin                  DateTime      @default(now())
   isVerified                 Boolean       @default(false)
   resetPasswordToken         String?
@@ -52,140 +31,79 @@ model User {
   verificationTokenExpiresAt DateTime?
   createdAt                  DateTime      @default(now())
   updatedAt                  DateTime      @updatedAt
-  transactions               Transaction[]
 
-  // One-to-One Relation with Student (Only if the user is a student)
-  student Student?
+  sermons     Sermon[]
+  donations   Donation[]
+
+  Blog Blog[]
+
+  PrayerRequest PrayerRequest[]
+
+  Podcast Podcast[]
 }
 
-model Student {
-  id                        String      @id @default(uuid())
-  userId                    String      @unique
-  user                      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  age                       Int
-  gender                    Gender?
-  contactInfo               String?
-  backgroundSummary         String?
-  initialAssessment         String?
-  aptitudesAndStrengths     String?
-  shortTermGoals            String?
-  longTermObjectives        String?
-  workshopsAttended         String?
-  resourcesUtilized         String?
-  skillsDevelopment         String?
-  behavioralChanges         String?
-  feedbackAndSelfReflection String?
-  obstaclesEncountered      String?
-  interventionsProvided     String?
-  accountType               AccountType @default(SILVER)
-  createdAt                 DateTime    @default(now())
-  updatedAt                 DateTime    @updatedAt
-}
 
-model Category {
-  id      String   @id @default(uuid())
-  name    String
-  courses Course[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Course {
-  id               String   @id @default(uuid())
-  userId           String
-  teacherName      String
-  title            String
-  description      String?
-  imageUrl         String?
-  price            Float?
-  isPublished      Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  enrollmentsCount Int      @default(0)
-
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
-
-  attachments  Attachment[]
-  chapters     Chapter[]
-  transactions Transaction[]
-
-  @@index([categoryId])
-}
-
-model Attachment {
-  id   String @id @default(uuid())
-  name String
-  url  String
-
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([courseId])
-}
-
-model Chapter {
+model Sermon {
   id          String  @id @default(uuid())
   title       String
   description String?
+  date        DateTime @default(now())
   videoUrl    String?
+  audioUrl    String?
+  preacher    User?     @relation(fields: [preacherId], references: [id])
+  preacherId  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  date        DateTime
+  location    String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Donation {
+  id          String  @id @default(uuid())
+  amount      Float?
+  donor       User?    @relation(fields: [donorId], references: [id])
+  donorId     String?
+  message     String?
+  createdAt   DateTime @default(now())
+}
+
+model Blog {
+  id          String  @id @default(uuid())
+  title       String
   content     String?
-  position    Int
-  isPublished Boolean @default(false)
-  isFree      Boolean @default(false)
-  courseId    String
-  course      Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  userProgress UserProgress[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([courseId])
+  author      User?     @relation(fields: [authorId], references: [id])
+  authorId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model Transaction {
-  id              String   @id @default(uuid())
-  userId          String?
-  transactionId   String
-  dateTime        DateTime
-  courseId        String?
-  paymentProvider String
-  amount          Float?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  user            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course          Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId])
-  @@index([courseId])
+model PrayerRequest {
+  id          String  @id @default(uuid())
+  request     String?
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+  createdAt   DateTime @default(now())
 }
 
-model UserProgress {
-  id     String @id @default(uuid())
-  userId String
-
-  chapterId String
-  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-
-  isCompleted Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, chapterId])
-  @@index([chapterId])
+model Podcast {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  videoUrl    String?
+  duration    Int?      // Duration in seconds
+  speaker     User?     @relation(fields: [speakerId], references: [id])
+  speakerId   String?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model Gallery {
-  id        String   @id @default(uuid())
-  caption   String
-  imageUrls String[] // Updated to be an array of strings
-  date      DateTime // Start date of the event
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
