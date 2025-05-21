@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
+
+model User {
+  id                         String    @id @default(uuid())
+  email                      String    @unique
+  password                   String?
+  phoneNumber                String?
+  name                       String
+  avatar                     String?
+  about                      String?
+  role                       Role      @default(USER)
+  lastLogin                  DateTime  @default(now())
+  isVerified                 Boolean   @default(false)
+  resetPasswordToken         String?
+  resetPasswordExpiresAt     DateTime?
+  verificationToken          String?
+  verificationTokenExpiresAt DateTime?
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+
+  sermons   Sermon[]
+  donations Donation[]
+
+  Blog Blog[]
+
+  PrayerRequest PrayerRequest[]
+
+  Podcast Podcast[]
+}
+
+model Sermon {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  date        DateTime @default(now())
+  videoUrl    String?
+  audioUrl    String?
+  preacher    User?    @relation(fields: [preacherId], references: [id])
+  preacherId  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  date        DateTime
+  location    String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Gallery {
+  id        String   @id @default(uuid())
+  caption   String
+  imageUrls String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Donation {
+  id        String   @id @default(uuid())
+  amount    Float?
+  donor     User?    @relation(fields: [donorId], references: [id])
+  donorId   String?
+  message   String?
+  createdAt DateTime @default(now())
+}
+
+model Blog {
+  id        String   @id @default(uuid())
+  title     String
+  content   String?
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PrayerRequest {
+  id        String   @id @default(uuid())
+  request   String?
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  createdAt DateTime @default(now())
+}
+
+model Podcast {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  audioUrl    String?
+  videoUrl    String?
+  duration    Int? // Duration in seconds
+  speaker     User?    @relation(fields: [speakerId], references: [id])
+  speakerId   String?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
