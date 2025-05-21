@@ -10,8 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteGallery = exports.updateGallery = exports.getAllGallery = exports.createGallery = void 0;
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
+const lib_1 = require("../../lib");
 const createGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { caption, imageUrls, date } = req.body;
     // Validate input
@@ -29,11 +28,11 @@ const createGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     try {
         // Create the new gallery
-        const newGallery = yield prisma.gallery.create({
+        const newGallery = yield lib_1.prisma.gallery.create({
             data: {
                 caption,
                 imageUrls,
-                date: new Date(date),
+                createdAt: new Date(date),
             },
         });
         res.status(201).json({
@@ -54,7 +53,7 @@ const createGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.createGallery = createGallery;
 const getAllGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const gallery = yield prisma.gallery.findMany({
+        const gallery = yield lib_1.prisma.gallery.findMany({
             orderBy: { createdAt: 'desc' },
         });
         res.status(200).json({
@@ -85,7 +84,7 @@ const updateGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return;
     }
     try {
-        const existingGallery = yield prisma.gallery.findUnique({
+        const existingGallery = yield lib_1.prisma.gallery.findUnique({
             where: { id },
         });
         if (!existingGallery) {
@@ -102,11 +101,11 @@ const updateGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 imageUrls.length > 0
                 ? imageUrls
                 : existingGallery.imageUrls,
-            date: date
+            createdAt: date
                 ? new Date(date)
-                : existingGallery.date,
+                : existingGallery.createdAt,
         };
-        const updatedGallery = yield prisma.gallery.update({
+        const updatedGallery = yield lib_1.prisma.gallery.update({
             where: { id },
             data: updatedData,
         });
@@ -137,7 +136,7 @@ const deleteGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return;
     }
     try {
-        const existingGallery = yield prisma.gallery.findUnique({
+        const existingGallery = yield lib_1.prisma.gallery.findUnique({
             where: { id },
         });
         if (!existingGallery) {
@@ -147,7 +146,7 @@ const deleteGallery = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             });
             return;
         }
-        yield prisma.gallery.delete({
+        yield lib_1.prisma.gallery.delete({
             where: { id },
         });
         res.status(200).json({

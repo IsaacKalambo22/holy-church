@@ -13,12 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.forgotPassword = exports.resetPassword = exports.setPassword = exports.login = exports.registerUser = void 0;
-const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
 const emails_1 = require("../../nodemailer/emails");
 const utils_1 = require("../../utils");
-const prisma = new client_1.PrismaClient();
+const lib_1 = require("../../lib");
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, role, phoneNumber, password, } = req.body;
     // Validate user input
@@ -31,7 +30,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
     try {
         // Check if the email already exists
-        const existingUser = yield prisma.user.findUnique({
+        const existingUser = yield lib_1.prisma.user.findUnique({
             where: { email },
         });
         if (existingUser) {
@@ -56,13 +55,13 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             hashedPassword = yield bcrypt_1.default.hash(password, saltRounds);
         }
         // Create the user
-        const newUser = yield prisma.user.create({
+        const newUser = yield lib_1.prisma.user.create({
             data: {
                 name,
                 email,
                 phoneNumber: phoneNumber || null,
                 password: hashedPassword || null,
-                role: role || client_1.Role.USER,
+                role: role || lib_1.Role.USER,
                 verificationToken: hashedToken,
                 verificationTokenExpiresAt, // 24 hours
             },
@@ -101,7 +100,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     try {
         // Check if the user exists
-        const user = yield prisma.user.findUnique({
+        const user = yield lib_1.prisma.user.findUnique({
             where: { email },
         });
         console.log({ user });
@@ -123,7 +122,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const { access_token, refresh_token } = (0, utils_1.generateTokens)(user.id, user.email, user.role);
         // Update the user's last login timestamp
-        yield prisma.user.update({
+        yield lib_1.prisma.user.update({
             where: { id: user.id },
             data: { lastLogin: new Date() },
         });
@@ -172,7 +171,7 @@ const setPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             .update(verificationToken)
             .digest('hex');
         // Find the user with the matching token and ensure it's not expired
-        const user = yield prisma.user.findFirst({
+        const user = yield lib_1.prisma.user.findFirst({
             where: {
                 verificationToken: hashedToken,
                 verificationTokenExpiresAt: {
@@ -190,7 +189,7 @@ const setPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         // Hash the new password
         const hashedPassword = yield bcrypt_1.default.hash(password, 10);
         // Update the user's record
-        yield prisma.user.update({
+        yield lib_1.prisma.user.update({
             where: { id: user.id },
             data: {
                 password: hashedPassword,
@@ -232,7 +231,7 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             .update(verificationToken)
             .digest('hex');
         // Find the user with the matching token and ensure it's not expired
-        const user = yield prisma.user.findFirst({
+        const user = yield lib_1.prisma.user.findFirst({
             where: {
                 resetPasswordToken: hashedToken,
                 resetPasswordExpiresAt: {
@@ -251,7 +250,7 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // Hash the new password
         const hashedPassword = yield bcrypt_1.default.hash(password, 10);
         // Update the user's record
-        yield prisma.user.update({
+        yield lib_1.prisma.user.update({
             where: { id: user.id },
             data: {
                 password: hashedPassword,
@@ -296,7 +295,7 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
             .digest('hex');
         const resetPasswordExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
         // Find the user with the matching token and ensure it's not expired
-        const user = yield prisma.user.findFirst({
+        const user = yield lib_1.prisma.user.findFirst({
             where: {
                 email: email,
             },
@@ -309,7 +308,7 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
             return;
         }
         // Update the user's record
-        yield prisma.user.update({
+        yield lib_1.prisma.user.update({
             where: { id: user.id },
             data: {
                 resetPasswordToken: hashedToken, // Clear the token

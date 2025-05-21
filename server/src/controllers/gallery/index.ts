@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+
 import { Request, Response } from 'express';
 import { APIResponse } from '../../types/types';
+import { prisma } from '../../lib';
 
-const prisma = new PrismaClient();
 
 export const createGallery = async (
   req: Request,
@@ -34,7 +34,7 @@ export const createGallery = async (
         data: {
           caption,
           imageUrls,
-          date: new Date(date),
+          createdAt: new Date(date),
         },
       });
 
@@ -126,9 +126,9 @@ export const updateGallery = async (
         imageUrls.length > 0
           ? imageUrls
           : existingGallery.imageUrls,
-      date: date
+      createdAt: date
         ? new Date(date)
-        : existingGallery.date,
+        : existingGallery.createdAt,
     };
 
     const updatedGallery =

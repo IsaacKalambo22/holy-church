@@ -1,12 +1,8 @@
-import {
-  PrismaClient,
-} from '@prisma/client';
-import { Request, Response } from 'express';
-import {
-  APIResponse,
-} from '../../types/types';
 
-const prisma = new PrismaClient();
+import { Request, Response } from 'express';
+import { APIResponse } from '../../types/types';
+import { Role, prisma } from '../../lib';
+
 
 export const getSermons = async (
   req: Request,
@@ -85,36 +81,12 @@ export const createSermon = async (
   res: Response<APIResponse>
 ): Promise<void> => {
   try {
-    console.log(req.body);
-    console.log(req.user);
+    const { title, description, videoUrl, audioUrl, preacherId } = req.body;
 
-    // Get user ID from request (assuming authentication middleware)
-    const userId = req?.user?.id;
-
-    if (!userId) {
-      res.status(401).json({
+    if (!title) {
+      res.status(400).json({
         success: false,
-        message:
-          'Unauthorized: User ID is missing.',
-      });
-      return;
-    }
-
-    // Find the user in the database by userId
-    const user = await prisma.user.findFirst({
-      where: { id: userId },
-    });
-
-    // Check if user exists and has the required role
-    if (
-      !user ||
-      (user.role !== 'TEACHER' &&
-        user.role !== 'ADMIN')
-    ) {
-      res.status(403).json({
-        success: false,
-        message:
-          'Unauthorized: Only teachers or admins can create a sermon.',
+        message: 'Title is required',
       });
       return;
     }
@@ -122,10 +94,15 @@ export const createSermon = async (
     // Create Sermon
     const newSermon = await prisma.sermon.create({
       data: {
-        userId: user.id,
-        teacherName: user.name,
-        title: 'Untitled title',
+        title,
+        description,
+        videoUrl,
+        audioUrl,
+        preacherId,
       },
+      include: {
+        preacher: true
+      }
     });
 
     res.status(201).json({
@@ -154,41 +131,12 @@ export const updateSermon = async (
   try {
     const { id: sermonId } = req.params;
 
-    const {
-      title,
-      description,
-      category,
-      imageUrl,
-      price,
-      isPublished,
-    } = req.body;
+    const { title, description, videoUrl, audioUrl, preacherId } = req.body;
 
-    const userId = req?.user?.id;
-
-    // Find the user in the database
-    const user = await prisma.user.findFirst({
-      where: { id: userId },
+    // Find the sermon to ensure it exists
+    const existingSermon = await prisma.sermon.findUnique({
+      where: { id: sermonId },
     });
-
-    // Check if user exists and has the required role
-    if (
-      !user ||
-      (user.role !== 'TEACHER' &&
-        user.role !== 'ADMIN')
-    ) {
-      res.status(403).json({
-        success: false,
-        message:
-          'Unauthorized: Only teachers or admins can update a sermon.',
-      });
-      return;
-    }
-
-    // Find the sermon to ensure it exists and the user is authorized to update it
-    const existingSermon =
-      await prisma.sermon.findUnique({
-        where: { id: sermonId },
-      });
 
     if (!existingSermon) {
       res.status(404).json({
@@ -198,64 +146,20 @@ export const updateSermon = async (
       return;
     }
 
-    if (
-      user.role !== 'ADMIN' &&
-      existingSermon.userId !== userId
-    ) {
-      res.status(403).json({
-        success: false,
-        message:
-          'Unauthorized: You can only update your own sermons.',
-      });
-      return;
-    }
-
-    // Find or create the category if necessary
-    let categoryId = existingSermon.categoryId;
-    if (category) {
-      const categoryRecord =
-        await prisma.category.findFirst({
-          where: { name: category },
-        });
-
-      if (!categoryRecord) {
-        const newCategory =
-          await prisma.category.create({
-            data: { name: category },
-          });
-        categoryId = newCategory.id;
-      } else {
-        categoryId = categoryRecord.id;
-      }
-    }
-
-    // Prepare updated data
-    const updatedData: Partial<
-      typeof existingSermon
-    > = {
-      title:
-        title?.trim() || existingSermon.title,
-      description:
-        description?.trim() ||
-        existingSermon.description,
-      imageUrl:
-        imageUrl?.trim() ||
-        existingSermon.imageUrl,
-      price:
-        price !== undefined && price !== ''
-          ? Number(price)
-          : existingSermon.price,
-      isPublished:
-        isPublished ?? existingSermon.isPublished,
-      categoryId,
-    };
-
     // Update the sermon
-    const updatedSermon =
-      await prisma.sermon.update({
-        where: { id: sermonId },
-        data: updatedData,
-      });
+    const updatedSermon = await prisma.sermon.update({
+      where: { id: sermonId },
+      data: {
+        title: title || existingSermon.title,
+        description: description || existingSermon.description,
+        videoUrl: videoUrl || existingSermon.videoUrl,
+        audioUrl: audioUrl || existingSermon.audioUrl,
+        preacherId: preacherId || existingSermon.preacherId,
+      },
+      include: {
+        preacher: true
+      }
+    });
 
     res.status(200).json({
       success: true,
@@ -281,38 +185,16 @@ export const deleteSermon = async (
   res: Response<APIResponse>
 ): Promise<void> => {
   const { id } = req.params;
-  const userId = req?.user?.id;
-
   try {
-    if (!userId || !id) {
-      res.status(404).json({
-        success: false,
-        message:
-          'User id and sermon id are required',
-      });
-      return;
-    }
     // Find the sermon by its ID
-    const sermon = await prisma.sermon.findUnique(
-      {
-        where: { id: id },
-      }
-    );
+    const sermon = await prisma.sermon.findUnique({
+      where: { id: id },
+    });
 
     if (!sermon) {
       res.status(404).json({
         success: false,
         message: 'Sermon not found',
-      });
-      return;
-    }
-
-    // Check if the logged-in user is the teacher for this sermon
-    if (sermon.userId !== userId) {
-      res.status(403).json({
-        success: false,
-        message:
-          'Not authorized to delete this sermon',
       });
       return;
     }

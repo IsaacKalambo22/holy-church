@@ -11,7 +11,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 /* ROUTE IMPORTS */
 const auth_1 = __importDefault(require("./routes/auth"));
-const course_1 = __importDefault(require("./routes/course"));
+const semon_1 = __importDefault(require("./routes/semon"));
 const gallery_1 = __importDefault(require("./routes/gallery"));
 const transaction_1 = __importDefault(require("./routes/transaction"));
 const user_1 = __importDefault(require("./routes/user"));
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 });
 app.use('/identity-impact-hub/auth', auth_1.default);
 app.use('/identity-impact-hub/users', user_1.default);
-app.use('/identity-impact-hub/courses', course_1.default);
+app.use('/identity-impact-hub/courses', semon_1.default);
 app.use('/identity-impact-hub/gallery', gallery_1.default);
 app.use('/identity-impact-hub/transactions', transaction_1.default);
 /* SERVER */
