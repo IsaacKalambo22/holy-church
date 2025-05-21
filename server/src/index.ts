@@ -1,52 +1,92 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
 /* ROUTE IMPORTS */
 import auth from './routes/auth';
-import courses from './routes/semon';
+import sermons from './routes/sermon';
 import gallery from './routes/gallery';
-import transactions from './routes/transaction';
+import donations from './routes/transaction';
 import users from './routes/user';
 
 /* CONFIGURATIONS */
 dotenv.config();
 const app = express();
+
+// Basic middleware
 app.use(express.json());
-app.use(helmet());
-app.use(
-  helmet.crossOriginResourcePolicy({
-    policy: 'cross-origin',
-  })
-);
-app.use(morgan('common'));
 app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({ extended: false })
-);
-app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(morgan('common'));
+
+// Security middleware
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+app.use(helmet.noSniff());
+app.use(helmet.xssFilter());
+app.use(helmet.hidePoweredBy());
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+
 
 /* ROUTES */
-app.get('/', (req, res) => {
-  res.send(
-    '<html><body><h1>Welcome to the Home Route</h1></body></html>'
-  );
+const API_PREFIX = '/api/v1';
+
+// Health check
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Welcome to Holy Church API',
+    timestamp: new Date().toISOString()
+  });
 });
 
-app.use('/identity-impact-hub/auth', auth);
-app.use('/identity-impact-hub/users', users);
-app.use('/identity-impact-hub/courses', courses);
-app.use('/identity-impact-hub/gallery', gallery);
-app.use(
-  '/identity-impact-hub/transactions',
-  transactions
-);
+// API routes
+app.use('/auth', auth);
+app.use('/users', users);
+app.use('/sermons', sermons);
+app.use('/gallery', gallery);
+app.use('/donations', donations);
+
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
+    status: 'error',
+    message: `Cannot ${req.method} ${req.url}`
+  });
+});
+
+// Global error handler
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    status: 'error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
 
 /* SERVER */
 const PORT = Number(process.env.PORT) || 8000;
-app.listen(PORT, () => {
-  console.log(`Server Listening on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err: Error) => {
+  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.error(err);
+  // Gracefully shutdown
+  server.close(() => {
+    process.exit(1);
+  });
 });

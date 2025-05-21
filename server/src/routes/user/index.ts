@@ -1,59 +1,32 @@
 import { Router } from 'express';
 import {
-  createStudent,
-  deleteStudent,
-  deleteUser,
   getAllUsers,
-  getStudentById,
-  getStudents,
-  getUserByEmail,
   getUserById,
-  sendContactMessage,
-  updateStudent,
+  getUserByEmail,
   updateUser,
+  deleteUser,
+  sendContactMessage,
+  requestPasswordReset,
+  resetPassword,
+  verifyEmail,
+  createUser
 } from '../../controllers/user';
-import {
-  verifyAdmin,
-  verifyToken,
-} from '../../middlewares/verify-token';
+import { verifyAdmin, verifyToken } from '../../middlewares/verify-token';
 
 const router = Router();
 
-router.get('/', getAllUsers);
+// Public routes
 router.post('/contact-email', sendContactMessage);
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password', resetPassword);
+router.post('/verify-email/:token', verifyEmail);
+router.post('/register', createUser);
 
-router.get('/students', getStudents);
-router.post(
-  '/students',
-  verifyAdmin,
-  createStudent
-);
-router.get(
-  '/students/:id',
-  verifyToken,
-  getStudentById
-);
-
-router.get('/email/:email', getUserByEmail);
+// Protected routes
+router.get('/', verifyToken, getAllUsers);
+router.get('/email/:email', verifyToken, getUserByEmail);
 router.get('/:id', verifyToken, getUserById);
-
 router.patch('/:id', verifyToken, updateUser);
 router.delete('/:id', verifyAdmin, deleteUser);
-
-// router.get(
-//   '/students/:id',
-//   verifyToken,
-//   getUserById
-// );
-router.patch(
-  '/students/:id',
-  verifyToken,
-  updateStudent
-);
-router.delete(
-  '/students/:id',
-  verifyToken,
-  deleteStudent
-);
 
 export default router;

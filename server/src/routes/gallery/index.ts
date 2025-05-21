@@ -5,13 +5,16 @@ import {
   getAllGallery,
   updateGallery,
 } from '../../controllers/gallery';
-import { verifyToken } from '../../middlewares/verify-token/index';
+import { verifyAdmin, verifyToken } from '../../middlewares/verify-token';
 
 const router = Router();
 
-router.post('/', verifyToken, createGallery);
+// Public routes
 router.get('/', getAllGallery);
-router.patch('/:id', verifyToken, updateGallery);
-router.delete('/:id', verifyToken, deleteGallery);
+
+// Protected routes
+router.post('/', verifyAdmin, createGallery);
+router.patch('/:id', verifyAdmin, updateGallery);
+router.delete('/:id', verifyAdmin, deleteGallery);
 
 export default router;

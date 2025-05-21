@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.forgotPassword = exports.resetPassword = exports.setPassword = exports.login = exports.registerUser = void 0;
+exports.refreshToken = exports.verifyEmail = exports.forgotPassword = exports.resetPassword = exports.setPassword = exports.login = exports.registerUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const emails_1 = require("../../nodemailer/emails");
 const utils_1 = require("../../utils");
 const lib_1 = require("../../lib");
@@ -311,7 +312,7 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         yield lib_1.prisma.user.update({
             where: { id: user.id },
             data: {
-                resetPasswordToken: hashedToken, // Clear the token
+                resetPasswordToken: hashedToken,
                 resetPasswordExpiresAt,
             },
         });
@@ -332,3 +333,93 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.forgotPassword = forgotPassword;
+const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = req.params;
+    if (!token) {
+        res.status(400).json({
+            success: false,
+            message: 'Verification token is required'
+        });
+        return;
+    }
+    try {
+        const hashedToken = crypto_1.default
+            .createHash('sha256')
+            .update(token)
+            .digest('hex');
+        const user = yield lib_1.prisma.user.findFirst({
+            where: {
+                verificationToken: hashedToken,
+                verificationTokenExpiresAt: {
+                    gt: new Date()
+                }
+            }
+        });
+        if (!user) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid or expired verification token'
+            });
+            return;
+        }
+        yield lib_1.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                isVerified: true,
+                verificationToken: null,
+                verificationTokenExpiresAt: null
+            }
+        });
+        res.status(200).json({
+            success: true,
+            message: 'Email verified successfully'
+        });
+    }
+    catch (error) {
+        console.error('Error verifying email:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error verifying email'
+        });
+    }
+});
+exports.verifyEmail = verifyEmail;
+const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies['jwt-refresh'];
+    if (!refreshToken) {
+        res.status(401).json({
+            success: false,
+            message: 'Refresh token is required'
+        });
+        return;
+    }
+    try {
+        // Verify the refresh token
+        const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const { userId, email, role } = decoded;
+        // Generate new tokens
+        const tokens = (0, utils_1.generateTokens)(userId, email, role);
+        // Set the new refresh token as an HTTP-only cookie
+        res.cookie('jwt-refresh', tokens.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+        res.status(200).json({
+            success: true,
+            message: 'Token refreshed successfully',
+            data: {
+                access_token: tokens.access_token
+            }
+        });
+    }
+    catch (error) {
+        console.error('Error refreshing token:', error);
+        res.status(401).json({
+            success: false,
+            message: 'Invalid refresh token'
+        });
+    }
+});
+exports.refreshToken = refreshToken;

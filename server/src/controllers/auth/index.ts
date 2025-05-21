@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 
 import {
   sendPasswordResetEmail,
@@ -402,7 +403,7 @@ export const forgotPassword = async (
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        resetPasswordToken: hashedToken, // Clear the token
+        resetPasswordToken: hashedToken,
         resetPasswordExpiresAt,
       },
     });
@@ -415,20 +416,119 @@ export const forgotPassword = async (
     // Return success response
     res.status(200).json({
       success: true,
-      message:
-        'Password reset link sent to your email',
+      message: 'Password reset link sent to your email',
       email: user.email,
     });
   } catch (error) {
-    console.error(
-      'Error sending password reset link:',
-      error
-    );
-
+    console.error('Error sending password reset link:', error);
     res.status(500).json({
       success: false,
-      message:
-        'An error occurred while sending password reset link. Please try again later.',
+      message: 'An error occurred while sending password reset link. Please try again later.',
+    });
+  }
+};
+
+export const verifyEmail = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { token } = req.params;
+
+  if (!token) {
+    res.status(400).json({
+      success: false,
+      message: 'Verification token is required'
+    });
+    return;
+  }
+
+  try {
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    const user = await prisma.user.findFirst({
+      where: {
+        verificationToken: hashedToken,
+        verificationTokenExpiresAt: {
+          gt: new Date()
+        }
+      }
+    });
+
+    if (!user) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token'
+      });
+      return;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isVerified: true,
+        verificationToken: null,
+        verificationTokenExpiresAt: null
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Email verified successfully'
+    });
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error verifying email'
+    });
+  }
+};
+
+export const refreshToken = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const refreshToken = req.cookies['jwt-refresh'];
+
+  if (!refreshToken) {
+    res.status(401).json({
+      success: false,
+      message: 'Refresh token is required'
+    });
+    return;
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!);
+    const { userId, email, role } = decoded as { userId: string; email: string; role: Role };
+
+    // Generate new tokens
+    const tokens = generateTokens(userId, email, role);
+
+    // Set the new refresh token as an HTTP-only cookie
+    res.cookie('jwt-refresh', tokens.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Token refreshed successfully',
+      data: {
+        access_token: tokens.access_token
+      }
+    });
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Invalid refresh token'
     });
   }
 };

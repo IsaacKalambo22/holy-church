@@ -1,8 +1,3 @@
-import {
-  AccountType,
-  PrismaClient,
-  Role,
-} from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { Request, Response } from 'express';
@@ -11,8 +6,7 @@ import {
   setPasswordRequestEmail,
 } from '../../nodemailer/emails';
 import { APIResponse } from '../../types/types';
-
-const prisma = new PrismaClient();
+import { prisma, Role } from '../../lib';
 
 export const getAllUsers = async (
   req: Request,
@@ -168,14 +162,12 @@ export const updateUser = async (
   res: Response<APIResponse>
 ): Promise<void> => {
   const { id } = req.params;
-
   const {
     name,
     email,
     password,
     role,
     phoneNumber,
-    district,
     avatar,
     about,
   } = req.body;
@@ -192,10 +184,9 @@ export const updateUser = async (
 
   try {
     // Check if the user exists
-    const existingUser =
-      await prisma.user.findUnique({
-        where: { id },
-      });
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    });
 
     if (!existingUser) {
       res.status(404).json({
@@ -205,52 +196,70 @@ export const updateUser = async (
       return;
     }
 
-    // Prepare updated data
-    const updatedData: Partial<
-      typeof existingUser
-    > = {
-      name: name?.trim() || existingUser.name,
+    // If email is being changed, check if it's already taken
+    if (email && email !== existingUser.email) {
+      const emailExists = await prisma.user.findUnique({
+        where: { email },
+      });
 
-      avatar:
-        avatar?.trim() || existingUser.avatar,
-      about: about?.trim() || existingUser.about,
-      email: email?.trim() || existingUser.email,
-      role: role?.trim() || existingUser.role,
-      phoneNumber:
-        phoneNumber?.trim() ||
-        existingUser.phoneNumber,
-    };
-
-    // Hash the password if it's being updated
-    if (password?.trim()) {
-      const saltRounds = 10;
-      updatedData.password = await bcrypt.hash(
-        password,
-        saltRounds
-      );
+      if (emailExists) {
+        res.status(400).json({
+          success: false,
+          message: 'Email is already in use.',
+        });
+        return;
+      }
     }
 
-    // Update the user details
+    // Validate role if provided
+    if (role && !Object.values(Role).includes(role)) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid role provided',
+      });
+      return;
+    }
+
+    // Update the user
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: updatedData,
+      data: {
+        ...(name && { name }),
+        ...(email && { email }),
+        ...(password && {
+          password: await bcrypt.hash(password, 10),
+        }),
+        ...(role && { role }),
+        ...(phoneNumber && { phoneNumber }),
+        ...(avatar && { avatar }),
+        ...(about && { about }),
+      },
+      select: {
+        id: true,
+        email: true,
+        phoneNumber: true,
+        name: true,
+        avatar: true,
+        about: true,
+        role: true,
+        lastLogin: true,
+        isVerified: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     // Respond with success
     res.status(200).json({
       success: true,
-      message: 'User updated successfully.',
+      message: 'User updated successfully',
       data: updatedUser,
     });
   } catch (error: any) {
-    console.error(
-      'Error updating user:',
-      error.message
-    );
+    console.error('Error updating user:', error.message);
     res.status(500).json({
       success: false,
-      message:
-        'An error occurred while updating the user. Please try again later.',
+      message: 'An error occurred while updating the user. Please try again later.',
       error: error.message,
     });
   }
@@ -311,497 +320,300 @@ export const deleteUser = async (
   }
 };
 
-export const createStudent = async (
-  req: Request,
-  res: Response<APIResponse>
-): Promise<void> => {
-  try {
-    const {
-      email,
-      phoneNumber,
-      name,
-      avatar,
-      about,
-      age,
-      gender,
-      contactInfo,
-      backgroundSummary,
-      initialAssessment,
-      aptitudesAndStrengths,
-      shortTermGoals,
-      longTermObjectives,
-      workshopsAttended,
-      resourcesUtilized,
-      skillsDevelopment,
-      behavioralChanges,
-      feedbackAndSelfReflection,
-      obstaclesEncountered,
-      interventionsProvided,
-      accountType,
-    } = req.body;
-
-    // Validate required fields
-    if (!email || !name || !age) {
-      res.status(400).json({
-        success: false,
-        message:
-          'Email, name, and age are required.',
-        error: 'Validation error',
-      });
-      return;
-    }
-
-    // Check if the email is already taken
-    const existingUser =
-      await prisma.user.findUnique({
-        where: { email },
-      });
-
-    if (existingUser) {
-      res.status(400).json({
-        success: false,
-        message: 'Email is already in use.',
-        error: 'Duplicate email',
-      });
-      return;
-    }
-
-    // Create the user with role STUDENT
-    const user = await prisma.user.create({
-      data: {
-        email,
-        phoneNumber,
-        name,
-        avatar,
-        about,
-        role: Role.STUDENT, // Assigning Student Role
-      },
-    });
-
-    // Create the student record linked to the user
-    const student = await prisma.student.create({
-      data: {
-        userId: user.id,
-        age,
-        gender,
-        contactInfo,
-        backgroundSummary,
-        initialAssessment,
-        aptitudesAndStrengths,
-        shortTermGoals,
-        longTermObjectives,
-        workshopsAttended,
-        resourcesUtilized,
-        skillsDevelopment,
-        behavioralChanges,
-        feedbackAndSelfReflection,
-        obstaclesEncountered,
-        interventionsProvided,
-        accountType:
-          accountType || AccountType.SILVER,
-      },
-    });
-
-    const verificationToken = crypto
-      .randomBytes(32)
-      .toString('hex');
-
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(verificationToken)
-      .digest('hex');
-
-    const verificationTokenExpiresAt = new Date(
-      Date.now() + 24 * 60 * 60 * 1000
-    ); // 24 hours from now
-
-    await setPasswordRequestEmail(
-      email,
-      `${process.env.CLIENT_BASE_URL}/set-password/${verificationToken}`
-    );
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        verificationToken: hashedToken,
-        verificationTokenExpiresAt,
-      },
-    });
-
-    // Respond with success
-    res.status(201).json({
-      success: true,
-      message: 'Student created successfully',
-      data: { user, student },
-    });
-  } catch (error: any) {
-    console.error(
-      'Error creating student:',
-      error.message
-    );
-    res.status(500).json({
-      success: false,
-      message:
-        'An error occurred while creating the student. Please try again later.',
-      error: error.message,
-    });
-  }
-};
-
-export const updateStudent = async (
-  req: Request,
-  res: Response<APIResponse>
-): Promise<void> => {
-  const id = req.params.id;
-  const {
-    email,
-    phoneNumber,
-    name,
-    avatar,
-    about,
-    age,
-    gender,
-    contactInfo,
-    backgroundSummary,
-    initialAssessment,
-    aptitudesAndStrengths,
-    shortTermGoals,
-    longTermObjectives,
-    workshopsAttended,
-    resourcesUtilized,
-    skillsDevelopment,
-    behavioralChanges,
-    feedbackAndSelfReflection,
-    obstaclesEncountered,
-    interventionsProvided,
-    accountType,
-  } = req.body;
-
-  // Validate input
-  if (!id) {
-    res.status(400).json({
-      success: false,
-      message: 'Student ID is required.',
-      error: 'Validation error',
-    });
-    return;
-  }
-
-  try {
-    // Check if the student exists
-    const existingStudent =
-      await prisma.student.findUnique({
-        where: { id },
-        include: { user: true },
-      });
-
-    if (!existingStudent) {
-      res.status(404).json({
-        success: false,
-        message: 'Student not found.',
-      });
-      return;
-    }
-
-    // Update the user details
-    const updatedUser = await prisma.user.update({
-      where: { id: existingStudent.userId },
-      data: {
-        email:
-          email?.trim() ||
-          existingStudent.user.email,
-        phoneNumber:
-          phoneNumber?.trim() ||
-          existingStudent.user.phoneNumber,
-        name:
-          name?.trim() ||
-          existingStudent.user.name,
-        avatar:
-          avatar?.trim() ||
-          existingStudent.user.avatar,
-        about:
-          about?.trim() ||
-          existingStudent.user.about,
-      },
-    });
-
-    // Update the student details
-    const updatedStudent =
-      await prisma.student.update({
-        where: { id },
-        data: {
-          gender:
-            gender || existingStudent.gender,
-          age: age || existingStudent.age,
-          contactInfo:
-            contactInfo?.trim() ||
-            existingStudent.contactInfo,
-          backgroundSummary:
-            backgroundSummary?.trim() ||
-            existingStudent.backgroundSummary,
-          initialAssessment:
-            initialAssessment?.trim() ||
-            existingStudent.initialAssessment,
-          aptitudesAndStrengths:
-            aptitudesAndStrengths?.trim() ||
-            existingStudent.aptitudesAndStrengths,
-          shortTermGoals:
-            shortTermGoals?.trim() ||
-            existingStudent.shortTermGoals,
-          longTermObjectives:
-            longTermObjectives?.trim() ||
-            existingStudent.longTermObjectives,
-          workshopsAttended:
-            workshopsAttended?.trim() ||
-            existingStudent.workshopsAttended,
-          resourcesUtilized:
-            resourcesUtilized?.trim() ||
-            existingStudent.resourcesUtilized,
-          skillsDevelopment:
-            skillsDevelopment?.trim() ||
-            existingStudent.skillsDevelopment,
-          behavioralChanges:
-            behavioralChanges?.trim() ||
-            existingStudent.behavioralChanges,
-          feedbackAndSelfReflection:
-            feedbackAndSelfReflection?.trim() ||
-            existingStudent.feedbackAndSelfReflection,
-          obstaclesEncountered:
-            obstaclesEncountered?.trim() ||
-            existingStudent.obstaclesEncountered,
-          interventionsProvided:
-            interventionsProvided?.trim() ||
-            existingStudent.interventionsProvided,
-          accountType:
-            accountType ||
-            existingStudent.accountType,
-        },
-      });
-
-    // Respond with success
-    res.status(200).json({
-      success: true,
-      message: 'Student updated successfully.',
-      data: {
-        user: updatedUser,
-        student: updatedStudent,
-      },
-    });
-  } catch (error: any) {
-    console.error(
-      'Error updating student:',
-      error.message
-    );
-    res.status(500).json({
-      success: false,
-      message:
-        'An error occurred while updating the student. Please try again later.',
-      error: error.message,
-    });
-  }
-};
-
-export const getStudents = async (
-  req: Request,
-  res: Response<APIResponse>
-): Promise<void> => {
-  try {
-    const students =
-      await prisma.student.findMany({
-        orderBy: { createdAt: 'desc' },
-
-        include: {
-          user: true, // Fetch associated user details
-        },
-      });
-
-    res.status(200).json({
-      success: true,
-      message: 'Students retrieved successfully.',
-      data: students,
-    });
-  } catch (error: any) {
-    console.error(
-      'Error fetching students:',
-      error.message
-    );
-    res.status(500).json({
-      success: false,
-      message:
-        'An error occurred while fetching students.',
-      error: error.message,
-    });
-  }
-};
-
-export const deleteStudent = async (
-  req: Request,
-  res: Response<APIResponse>
-): Promise<void> => {
-  const { id } = req.params;
-
-  if (!id) {
-    res.status(400).json({
-      success: false,
-      message: 'Student ID is required.',
-      error: 'Validation error',
-    });
-    return;
-  }
-
-  try {
-    // Find the student first
-    const student =
-      await prisma.student.findUnique({
-        where: { id },
-        include: { user: true },
-      });
-
-    if (!student) {
-      res.status(404).json({
-        success: false,
-        message: 'Student not found.',
-      });
-      return;
-    }
-
-    // Delete the student record
-    await prisma.student.delete({
-      where: { id },
-    });
-
-    // Delete the associated user
-    await prisma.user.delete({
-      where: { id: student.userId },
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Student deleted successfully.',
-    });
-  } catch (error: any) {
-    console.error(
-      'Error deleting student:',
-      error.message
-    );
-    res.status(500).json({
-      success: false,
-      message:
-        'An error occurred while deleting the student.',
-      error: error.message,
-    });
-  }
-};
-
-export const getStudentById = async (
-  req: Request,
-  res: Response<APIResponse>
-): Promise<void> => {
-  const { id } = req.params;
-
-  // Validate input
-  if (!id) {
-    res.status(400).json({
-      success: false,
-      message: 'Student ID is required.',
-      error: 'Validation error',
-    });
-    return;
-  }
-
-  try {
-    // Check if the student exists
-    const student =
-      await prisma.student.findUnique({
-        where: { id },
-        include: { user: true },
-      });
-
-    if (!student) {
-      res.status(404).json({
-        success: false,
-        message: 'Student not found.',
-      });
-      return;
-    }
-
-    // Respond with success
-    res.status(200).json({
-      success: true,
-      message: 'Student retrieved successfully',
-      data: student,
-    });
-  } catch (error: any) {
-    console.error(
-      'Error fetching students:',
-      error.message
-    );
-    res.status(500).json({
-      success: false,
-      message:
-        'An error occurred while fetching students. Please try again later.',
-      error: error.message,
-    });
-  }
-};
-
 export const sendContactMessage = async (
   req: Request,
   res: Response<APIResponse>
 ): Promise<void> => {
-  const { name, email, phoneNumber, message } =
-    req.body;
+  const { name, email, phoneNumber, message } = req.body;
 
   // Validate user input
-  if (
-    !name ||
-    !email ||
-    !phoneNumber ||
-    !message
-  ) {
+  if (!name || !email || !phoneNumber || !message) {
     res.status(400).json({
       success: false,
-      message:
-        'Name, email, phone number, and message are required.',
+      message: 'Name, email, phone number, and message are required.'
     });
     return;
   }
 
   try {
-    // Format email body using template
-
-    // Send email
-    const result = await sendContactEmail(
-      email,
-      name,
-      message,
-      phoneNumber
-    );
+    const result = await sendContactEmail(email, name, message, phoneNumber);
 
     if (result.success) {
-      console.log(
-        'Contact email sent successfully'
-      );
+      console.log('Contact email sent successfully');
       res.status(200).json({
         success: true,
-        message: 'Email sent successfully!',
+        message: 'Email sent successfully!'
       });
     } else {
-      console.error(
-        'Failed to send contact email:',
-        result.message
-      );
+      console.error('Failed to send contact email:', result.message);
       res.status(500).json({
         success: false,
-        message: result.message,
+        message: result.message
       });
     }
   } catch (error) {
     console.error('Error sending email:', error);
     res.status(500).json({
       success: false,
-      message:
-        'An error occurred while sending email. Please try again later.',
+      message: 'An error occurred while sending email. Please try again later.'
+    });
+  }
+};
+
+export const requestPasswordReset = async (
+  req: Request,
+  res: Response<APIResponse>
+): Promise<void> => {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400).json({
+      success: false,
+      message: 'Email is required'
+    });
+    return;
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+      return;
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Save hashed token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetPasswordToken: resetToken,
+        resetPasswordExpiresAt: resetTokenExpiresAt
+      }
+    });
+
+    // Send reset email
+    await setPasswordRequestEmail(email, `${process.env.CLIENT_BASE_URL}/reset-password/${resetToken}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset instructions have been sent to your email'
+    });
+  } catch (error) {
+    console.error('Error requesting password reset:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error requesting password reset'
+    });
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response<APIResponse>
+): Promise<void> => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    res.status(400).json({
+      success: false,
+      message: 'Token and password are required'
+    });
+    return;
+  }
+
+  try {
+    // Find user with valid reset token
+    const user = await prisma.user.findFirst({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpiresAt: {
+          gt: new Date()
+        }
+      }
+    });
+
+    if (!user) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token'
+      });
+      return;
+    }
+
+    // Hash new password and update user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpiresAt: null
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully'
+    });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error resetting password'
+    });
+  }
+};
+
+export const verifyEmail = async (
+  req: Request,
+  res: Response<APIResponse>
+): Promise<void> => {
+  const { token } = req.params;
+
+  if (!token) {
+    res.status(400).json({
+      success: false,
+      message: 'Verification token is required'
+    });
+    return;
+  }
+
+  try {
+    // Find user with valid verification token
+    const user = await prisma.user.findFirst({
+      where: {
+        verificationToken: token,
+        verificationTokenExpiresAt: {
+          gt: new Date()
+        }
+      }
+    });
+
+    if (!user) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token'
+      });
+      return;
+    }
+
+    // Update user verification status
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isVerified: true,
+        verificationToken: null,
+        verificationTokenExpiresAt: null
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Email verified successfully'
+    });
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error verifying email'
+    });
+  }
+};
+
+export const createUser = async (
+  req: Request,
+  res: Response<APIResponse>
+): Promise<void> => {
+  const { name, email, password, phoneNumber, role } = req.body;
+
+  // Validate required fields
+  if (!name || !email || !password) {
+    res.status(400).json({
+      success: false,
+      message: 'Name, email, and password are required',
+      error: 'Validation error'
+    });
+    return;
+  }
+
+  try {
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+      return;
+    }
+
+    // Validate role if provided
+    if (role && !Object.values(Role).includes(role)) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid role provided'
+      });
+      return;
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Create user
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        phoneNumber,
+        role: role || Role.USER,
+        isVerified: false,
+        verificationToken,
+        verificationTokenExpiresAt,
+        lastLogin: new Date()
+      },
+      select: {
+        id: true,
+        email: true,
+        phoneNumber: true,
+        name: true,
+        role: true,
+        isVerified: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
+    // Send verification email
+    await setPasswordRequestEmail(email, `${process.env.CLIENT_BASE_URL}/verify-email/${verificationToken}`);
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully. Please check your email to verify your account.',
+      data: newUser
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating user',
+      error
     });
   }
 };

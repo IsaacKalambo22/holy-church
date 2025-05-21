@@ -6,20 +6,17 @@ import {
   getSermons,
   updateSermon
 } from '../../controllers/sermon';
-import {
-} from '../../controllers/sermon/index';
-import {
-  verifyAdmin
-} from '../../middlewares/verify-token';
+import { verifyAdmin } from '../../middlewares/verify-token';
 
 const router = Router();
 
+// Public routes
 router.get('/', getSermons);
-router.post('/', verifyAdmin, createSermon);
 router.get('/:id', getSermon);
+
+// Protected routes
+router.post('/', verifyAdmin, createSermon);
 router.patch('/:id', verifyAdmin, updateSermon);
-
-
 router.delete('/:id', verifyAdmin, deleteSermon);
 
 export default router;

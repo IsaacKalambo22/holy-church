@@ -2,10 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const gallery_1 = require("../../controllers/gallery");
-const index_1 = require("../../middlewares/verify-token/index");
+const verify_token_1 = require("../../middlewares/verify-token");
 const router = (0, express_1.Router)();
-router.post('/', index_1.verifyToken, gallery_1.createGallery);
+// Public routes
 router.get('/', gallery_1.getAllGallery);
-router.patch('/:id', index_1.verifyToken, gallery_1.updateGallery);
-router.delete('/:id', index_1.verifyToken, gallery_1.deleteGallery);
+// Protected routes
+router.post('/', verify_token_1.verifyAdmin, gallery_1.createGallery);
+router.patch('/:id', verify_token_1.verifyAdmin, gallery_1.updateGallery);
+router.delete('/:id', verify_token_1.verifyAdmin, gallery_1.deleteGallery);
 exports.default = router;
