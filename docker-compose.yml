@@ -1,0 +1,37 @@
+services:
+  wealth-bridge-web:
+    container_name: wealth-bridge-web
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_ENDPOINT: http://wealth-bridge-api:8003
+
+    image: wealth-bridge-web
+    restart: unless-stopped
+    ports:
+      - 3003:3003
+    networks:
+      - app_network
+    env_file:
+      - ./apps/web/.env.prod
+
+  wealth-bridge-api:
+    container_name: wealth-bridge-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    image: wealth-bridge-api
+    restart: unless-stopped
+    ports:
+      - 8003:8003
+    networks:
+      - app_network
+    env_file:
+      - ./apps/api/.env.prod
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  app_network:
+    external: true
