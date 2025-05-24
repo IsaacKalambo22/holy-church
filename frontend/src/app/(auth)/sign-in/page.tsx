@@ -2,27 +2,27 @@ import SignIn from '@/modules/auth/sign-in';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sign In | Identity Impact Hub',
+  title: 'Sign In | Holy Church',
   description:
-    'Access your Identity Impact Hub account and connect with a global community of changemakers and innovators.',
+    'Access your Holy Church account and connect with a global community of changemakers and innovators.',
   keywords: [
-    'Identity Impact Hub Login',
-    'Sign In Identity Impact Hub',
+    'Holy Church Login',
+    'Sign In Holy Church',
     'Social Impact Network',
     'Entrepreneurship Platform',
     'Leadership Community',
   ],
   openGraph: {
-    title: 'Sign In | Identity Impact Hub',
+    title: 'Sign In | Holy Church',
     description:
-      'Log in to your Identity Impact Hub account and continue your journey of impact and innovation.',
-    url: 'https://identityimpacthub.com/signin',
+      'Log in to your Holy Church account and continue your journey of impact and innovation.',
+    url: 'https://holychurch.com/signin',
     images: [
       {
-        url: 'https://identityimpacthub.com/assets/images/signin-og.png',
+        url: 'https://holychurch.com/assets/images/signin-og.png',
         width: 1200,
         height: 630,
-        alt: 'Sign In - Identity Impact Hub',
+        alt: 'Sign In - Holy Church',
       },
     ],
     type: 'website',
