@@ -5,12 +5,14 @@ import { auth } from './auth';
 const publicRoutes = [
   '/',
   '/contact-us',
-  '/services',
-  '/gallery',
-  '/courses',
   '/search',
   '/checkout',
-  '/about',
+  '/about-us',
+  '/sermons',
+  '/events',
+  '/blog',
+  '/give',
+  '/prayer-requests',
 ];
 
 export const authRoutes = [
@@ -36,8 +38,6 @@ export const middleware = auth(async (req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!token;
   console.log({ isLoggedIn });
-  const isCoursePage =
-    nextUrl.pathname.startsWith('/course');
   // Route checks
   const isApiAuthRoute =
     nextUrl.pathname.startsWith(apiAuthPrefix);
@@ -62,12 +62,6 @@ export const middleware = auth(async (req) => {
 
   // Allow public access to the login page without redirecting if not logged in
   if (isAuthRoute && !isLoggedIn) return;
-  if (
-    isCoursePage &&
-    isLoggedIn &&
-    (token.role === 'USER' ||
-      token.role === 'STUDENT')
-  )
     return;
 
   // Redirect logged-in users away from login and register pages
@@ -78,10 +72,10 @@ export const middleware = auth(async (req) => {
   // }
 
   // Redirect logged-in users away from sign-in/up pages
-  if (isAuthRoute && isLoggedIn) {
+  if (isAuthRoute && isLoggedIn && token) {
+    // At this point TypeScript knows token is not null
     const redirectTo =
-      token.role === 'ADMIN' ||
-      token.role === 'MANAGER'
+      token?.role === 'ADMIN' || token?.role === 'MANAGER'
         ? '/admin/dashboard'
         : '/user/dashboard';
     return NextResponse.redirect(
@@ -105,8 +99,8 @@ export const middleware = auth(async (req) => {
     }
 
     if (
-      token.role !== 'ADMIN' &&
-      token.role !== 'MANAGER'
+      token?.role !== 'ADMIN' &&
+      token?.role !== 'MANAGER'
     ) {
       return NextResponse.redirect(
         new URL('/current-dashboard', nextUrl)
