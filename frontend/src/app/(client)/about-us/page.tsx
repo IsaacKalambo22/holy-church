@@ -16,7 +16,7 @@ export default function AboutUsPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] w-full">
         <Image
-          src="/images/about-hero.jpg"
+          src="/assets/images/carousel/01.jpeg"
           alt="Church building"
           fill
           className="object-cover brightness-50"
@@ -68,7 +68,7 @@ export default function AboutUsPage() {
             </p>
             <div className="relative h-[300px] w-full rounded-lg overflow-hidden">
               <Image
-                src="/images/church-history.jpg"
+                src="/assets/images/carousel/02.jpg"
                 alt="Church history"
                 fill
                 className="object-cover"
@@ -128,17 +128,17 @@ const leaders = [
   {
     name: 'Pastor John Smith',
     role: 'Senior Pastor',
-    image: '/images/team/pastor-john.jpg',
+    image: '/assets/images/team/1.jpg',
   },
   {
     name: 'Sarah Johnson',
     role: 'Worship Leader',
-    image: '/images/team/sarah.jpg',
+    image: '/assets/images/team/2.jpg',
   },
   {
     name: 'Michael Brown',
     role: 'Youth Pastor',
-    image: '/images/team/michael.jpg',
+    image: '/assets/images/team/3.jpg',
   },
 ];
 
