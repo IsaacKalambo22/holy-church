@@ -14,16 +14,16 @@ export default function AboutUsPage() {
   return (
     <main className="flex-1">
       {/* Hero Section */}
-      <section className="relative h-[400px] w-full">
+      <section className="relative h-[400px] w-full mt-10">
         <Image
           src="/assets/images/carousel/01.jpeg"
           alt="Church building"
           fill
-          className="object-cover brightness-50"
+          className="object-cover brightness-[0.4] rounded-2xl"
           priority
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center max-w-4xl mx-auto leading-tight">
             About Holy Church
           </h1>
         </div>
