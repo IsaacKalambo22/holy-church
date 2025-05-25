@@ -2,7 +2,7 @@ import SetPassword from '@/modules/auth/set-password';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Set Password - Identity Impact Hub',
+  title: 'Set Password - Holy Church',
   description:
     'Access your account and manage your activities with Identity Impact Hub.',
 };
