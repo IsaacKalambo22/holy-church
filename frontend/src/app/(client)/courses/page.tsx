@@ -9,11 +9,11 @@ import CoursesHeader from '@/modules/client/courses/courses-header';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Courses | Identity Impact Hub',
+  title: 'Courses | Holy Church',
   description:
     'Explore our diverse range of courses designed to empower changemakers, entrepreneurs, and social impact leaders.',
   keywords: [
-    'Identity Impact Hub Courses',
+    'Holy Church Courses',
     'Entrepreneurship Training',
     'Social Impact Education',
     'Business Growth Workshops',
@@ -21,16 +21,16 @@ export const metadata: Metadata = {
     'Online Courses for Entrepreneurs',
   ],
   openGraph: {
-    title: 'Courses | Identity Impact Hub',
+    title: 'Courses | Holy Church',
     description:
-      'Discover transformative courses at Identity Impact Hub, designed to foster innovation, entrepreneurship, and sustainable impact.',
-    url: 'https://identityimpacthub.com/courses',
+      'Discover transformative courses at Holy Church, designed to foster innovation, entrepreneurship, and sustainable impact.',
+    url: 'https://holychurch.com/courses',
     images: [
       {
-        url: 'https://identityimpacthub.com/assets/images/courses-og.png',
+        url: 'https://holychurch.com/assets/images/courses-og.png',
         width: 1200,
         height: 630,
-        alt: 'Identity Impact Hub - Courses',
+        alt: 'Holy Church - Courses',
       },
     ],
     type: 'website',

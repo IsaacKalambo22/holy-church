@@ -2,11 +2,11 @@ import Gallery from '@/modules/client/gallery';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Gallery | Identity Impact Hub',
+  title: 'Gallery | Holy Church',
   description:
-    'Explore our gallery showcasing impactful events, inspiring changemakers, and transformative projects at Identity Impact Hub.',
+    'Explore our gallery showcasing impactful events, inspiring changemakers, and transformative projects at Holy Church.',
   keywords: [
-    'Identity Impact Hub Gallery',
+    'Holy Church Gallery',
     'Social Impact Projects',
     'Changemakers in Action',
     'Sustainable Development Photos',
@@ -14,16 +14,16 @@ export const metadata: Metadata = {
     'Innovation Hub Visuals',
   ],
   openGraph: {
-    title: 'Gallery | Identity Impact Hub',
+    title: 'Gallery | Holy Church',
     description:
-      'Discover inspiring moments and impactful initiatives through our gallery at Identity Impact Hub.',
-    url: 'https://identityimpacthub.com/gallery',
+      'Discover inspiring moments and impactful initiatives through our gallery at Holy Church.',
+    url: 'https://holychurch.com/gallery',
     images: [
       {
-        url: 'https://identityimpacthub.com/assets/images/gallery-og.png',
+        url: 'https://holychurch.com/assets/images/gallery-og.png',
         width: 1200,
         height: 630,
-        alt: 'Gallery - Identity Impact Hub',
+        alt: 'Gallery - Holy Church',
       },
     ],
     type: 'website',
