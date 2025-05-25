@@ -27,8 +27,8 @@ export const navItems: NavItem[] = [
     ),
   },
   {
-    title: 'Courses',
-    href: '/courses',
+    title: 'Sermons',
+    href: '/sermons',
     description:
       'Industry insights and articles from experts.',
     icon: (
@@ -40,8 +40,8 @@ export const navItems: NavItem[] = [
     ),
   },
   {
-    title: 'Services',
-    href: '/services',
+    title: 'Events',
+    href: '/events',
     description:
       'Industry insights and articles from experts.',
     icon: (
@@ -53,8 +53,8 @@ export const navItems: NavItem[] = [
     ),
   },
   {
-    title: 'Gallery',
-    href: '/gallery',
+    title: 'Blog',
+    href: '/blog',
     description:
       'Industry insights and articles from experts.',
     icon: (
@@ -65,19 +65,45 @@ export const navItems: NavItem[] = [
       />
     ),
   },
-  // {
-  //   title: 'Blogs',
-  //   href: '/blogs',
-  //   description:
-  //     'Industry insights and articles from experts.',
-  //   icon: (
-  //     <Icon
-  //       icon='lucide:pen-tool'
-  //       width='16'
-  //       height='16'
-  //     />
-  //   ),
-  // },
+  {
+    title: 'Give',
+    href: '/give',
+    description:
+      'Industry insights and articles from experts.',
+    icon: (
+      <Icon
+        icon='lucide:pen-tool'
+        width='16'
+        height='16'
+      />
+    ),
+  },
+  {
+    title: 'Prayer Requests',
+    href: '/prayer-requests',
+    description:
+      'Industry insights and articles from experts.',
+    icon: (
+      <Icon
+        icon='lucide:pen-tool'
+        width='16'
+        height='16'
+      />
+    ),
+  },
+  {
+    title: 'Podcasts',
+    href: '/podcasts',
+    description:
+      'Industry insights and articles from experts.',
+    icon: (
+      <Icon
+        icon='lucide:pen-tool'
+        width='16'
+        height='16'
+      />
+    ),
+  },
   {
     title: 'Contact',
     href: '/contact-us',
@@ -91,17 +117,17 @@ export const navItems: NavItem[] = [
       />
     ),
   },
-  //   {
-  //     title: 'About Us',
-  //     href: '/about-us',
-  //     description:
-  //       'Learn more about our organization and mission.',
-  //     icon: (
-  //       <Icon
-  //         icon='lucide:info'
-  //         width='16'
-  //         height='16'
-  //       />
-  //     ),
-  //   },
+    {
+      title: 'About Us',
+      href: '/about-us',
+      description:
+        'Learn more about our organization and mission.',
+      icon: (
+        <Icon
+          icon='lucide:info'
+          width='16'
+          height='16'
+        />
+      ),
+    },
 ];

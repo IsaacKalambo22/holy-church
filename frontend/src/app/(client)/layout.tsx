@@ -11,7 +11,7 @@ const Layout = async ({
     <main className='grid grid-rows-[auto_1fr_auto] h-full min-h-screen w-full  bg-top '>
       <Navbar />
 
-      <div className='max-w-7xl mx-auto px-6 sm:px-2 w-full h-full z-30'>
+      <div className='max-w-6xl mx-auto px-6 sm:px-2 w-full h-full z-30'>
         {children}
       </div>
 
