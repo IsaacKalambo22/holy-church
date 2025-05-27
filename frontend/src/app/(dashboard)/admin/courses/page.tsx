@@ -16,10 +16,10 @@ export const metadata: Metadata = {
     title: 'Admin Courses | Holy Church Assembly',
     description:
       'Manage courses efficiently, update content, and track enrollments from the admin panel.',
-    url: 'https://holychurchassembly.com/admin/courses',
+    url: 'https://holychurchassemblygit .com/admin/courses',
     images: [
       {
-        url: 'https://holychurchassembly.com/assets/images/admin-courses-og.png',
+        url: 'https://holychurchassemblygit .com/assets/images/admin-courses-og.png',
         width: 1200,
         height: 630,
         alt: 'Holy Church Assembly - Admin Courses',
