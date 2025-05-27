@@ -4,9 +4,9 @@ import EditCourse from '@/modules/admin/courses/edit-course';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Course Details - Identity Impact Hub',
+  title: 'Course Details - Holy Church Assembly',
   description:
-    'Enroll the latest courses from Identity Impact Hub.',
+    'Enroll the latest courses from Holy Church Assembly.',
 };
 
 interface Props {

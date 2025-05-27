@@ -2,27 +2,27 @@ import Courses from '@/modules/admin/courses';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Admin Courses | Identity Impact Hub',
+  title: 'Admin Courses | Holy Church Assembly',
   description:
-    'Manage courses, update content, and track enrollments from the Identity Impact Hub admin panel.',
+    'Manage courses, update content, and track enrollments from the Holy Church Assembly admin panel.',
   keywords: [
     'Admin Courses',
     'Course Management',
-    'Identity Impact Hub Admin',
+    'Holy Church Assembly Admin',
     'Online Learning',
     'Course Enrollment',
   ],
   openGraph: {
-    title: 'Admin Courses | Identity Impact Hub',
+    title: 'Admin Courses | Holy Church Assembly',
     description:
       'Manage courses efficiently, update content, and track enrollments from the admin panel.',
-    url: 'https://identityimpacthub.com/admin/courses',
+    url: 'https://holychurchassembly.com/admin/courses',
     images: [
       {
-        url: 'https://identityimpacthub.com/assets/images/admin-courses-og.png',
+        url: 'https://holychurchassembly.com/assets/images/admin-courses-og.png',
         width: 1200,
         height: 630,
-        alt: 'Identity Impact Hub - Admin Courses',
+        alt: 'Holy Church Assembly - Admin Courses',
       },
     ],
     type: 'website',
