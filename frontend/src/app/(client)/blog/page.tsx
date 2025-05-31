@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { BlogGrid } from '@/modules/client/blog/components/BlogGrid';
 
 export const metadata: Metadata = {
   title: 'Blog | Holy Church',
@@ -29,9 +30,55 @@ export const metadata: Metadata = {
   },
 };
 
+// Sample blog posts data - This would typically come from an API or CMS
+const samplePosts = [
+  {
+    id: '1',
+    title: 'Finding Peace Through Prayer',
+    slug: 'finding-peace-through-prayer',
+    excerpt: 'Discover how daily prayer can bring inner peace and spiritual growth in your life.',
+    content: '',
+    coverImage: '/images/blog/prayer.jpg',
+    date: 'May 31, 2025',
+    category: 'Spiritual Growth',
+    author: {
+      name: 'Pastor John',
+      image: '/images/authors/pastor-john.jpg'
+    }
+  },
+  {
+    id: '2',
+    title: 'Building a Strong Church Community',
+    slug: 'building-strong-church-community',
+    excerpt: 'Learn the essential elements that create a vibrant and supportive church community.',
+    content: '',
+    coverImage: '/images/blog/community.jpg',
+    date: 'May 28, 2025',
+    category: 'Community',
+    author: {
+      name: 'Sarah Wilson',
+      image: '/images/authors/sarah.jpg'
+    }
+  },
+  {
+    id: '3',
+    title: 'Understanding Biblical Wisdom',
+    slug: 'understanding-biblical-wisdom',
+    excerpt: 'A deep dive into the practical application of biblical wisdom in modern life.',
+    content: '',
+    coverImage: '/images/blog/bible-study.jpg',
+    date: 'May 25, 2025',
+    category: 'Bible Study',
+    author: {
+      name: 'Dr. Michael Brown',
+      image: '/images/authors/michael.jpg'
+    }
+  }
+];
+
 export default function BlogPage() {
   return (
-    <div className="py-12">
+    <div className="py-12 container mx-auto px-4">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Our Blog</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
@@ -39,10 +86,7 @@ export default function BlogPage() {
         </p>
       </div>
       
-      {/* Blog Posts Grid will be implemented here */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Blog post cards will be mapped here */}
-      </div>
+      <BlogGrid posts={samplePosts} />
     </div>
   );
 }
