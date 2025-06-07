@@ -66,7 +66,7 @@ export const navItems: NavItem[] = [
     ),
   },
   {
-    title: 'Give',
+    title: 'Donate',
     href: '/give',
     description:
       'Industry insights and articles from experts.',
