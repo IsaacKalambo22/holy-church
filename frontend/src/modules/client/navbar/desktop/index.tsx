@@ -45,7 +45,7 @@ const Desktop = () => {
             </Link>
             <Link
               href='/'
-              className=' bg-gradient-to-r text-purple-950 text-[1rem] leading-snug capitalize'
+              className=' bg-gradient-to-r text-purple-950 text-[1rem] font-bold leading-snug capitalize'
             >
               Holy Church Assembly
             </Link>

@@ -38,7 +38,7 @@ const samplePosts = [
     slug: 'finding-peace-through-prayer',
     excerpt: 'Discover how daily prayer can bring inner peace and spiritual growth in your life.',
     content: '',
-    coverImage: '/images/blog/prayer.jpg',
+    coverImage: '/assets/images/carousel/1.jpg',
     date: 'May 31, 2025',
     category: 'Spiritual Growth',
     author: {
@@ -52,7 +52,7 @@ const samplePosts = [
     slug: 'building-strong-church-community',
     excerpt: 'Learn the essential elements that create a vibrant and supportive church community.',
     content: '',
-    coverImage: '/images/blog/community.jpg',
+    coverImage: '/assets/images/carousel/2.jpg',
     date: 'May 28, 2025',
     category: 'Community',
     author: {

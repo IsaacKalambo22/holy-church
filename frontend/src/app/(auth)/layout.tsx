@@ -16,8 +16,8 @@ const Layout = async ({
               <Image
                 src='/assets/images/logo.png'
                 alt='logo'
-                width={80}
-                height={80}
+                width={150}
+                height={150}
               />
             </Link>
             {/* <h1 className='text-2xl font-semibold text-white'>

@@ -39,7 +39,7 @@ const sampleEpisodes = [
     description: 'Join Pastor John as he discusses practical ways to strengthen your faith through daily spiritual practices.',
     audioUrl: '/audio/podcasts/walking-in-faith.mp3',
     duration: '32:15',
-    coverImage: '/images/podcasts/walking-in-faith.jpg',
+    coverImage: '/assets/images/carousel/3.jpg',
     date: 'June 1, 2025',
     series: 'Faith Journey',
     host: {
@@ -60,7 +60,7 @@ const sampleEpisodes = [
     description: 'A deep dive into how traditional Christian values and teachings apply in our modern world.',
     audioUrl: '/audio/podcasts/modern-christianity.mp3',
     duration: '45:30',
-    coverImage: '/images/podcasts/modern-christianity.jpg',
+    coverImage: '/assets/images/carousel/4.jpg',
     date: 'May 28, 2025',
     series: 'Modern Faith',
     host: {
@@ -75,7 +75,7 @@ const sampleEpisodes = [
     description: 'Learn effective techniques for deepening your prayer life and incorporating meaningful meditation into your daily routine.',
     audioUrl: '/audio/podcasts/prayer-meditation.mp3',
     duration: '28:45',
-    coverImage: '/images/podcasts/prayer-meditation.jpg',
+    coverImage: '/assets/images/carousel/5.jpg',
     date: 'May 25, 2025',
     series: 'Spiritual Practices',
     host: {
