@@ -2,28 +2,28 @@ import type { Metadata } from 'next';
 import { BlogGrid } from '@/modules/client/blog/components/BlogGrid';
 
 export const metadata: Metadata = {
-  title: 'Blog | Holy Church',
+  title: 'Blog | Holy Church Assembly',
   description:
-    'Read inspiring articles, spiritual insights, and community stories from Holy Church. Stay connected with our latest updates and teachings.',
+    'Read inspiring articles, spiritual insights, and community stories from Holy Church Assembly. Stay connected with our latest updates and teachings.',
   keywords: [
-    'Holy Church Blog',
+    'Holy Church Assembly Blog',
     'Christian Articles',
     'Spiritual Insights',
-    'Church News',
+    'Holy Church Assembly News',
     'Faith Stories',
     'Religious Teachings',
   ],
   openGraph: {
-    title: 'Blog | Holy Church',
+    title: 'Blog | Holy Church Assembly',
     description:
-      'Explore our collection of inspiring articles, spiritual insights, and community stories.',
+      'Explore our collection of inspiring articles, spiritual insights, and community stories from Holy Church Assembly.',
     url: 'https://holychurch.com/blog',
     images: [
       {
         url: 'https://holychurch.com/assets/images/blog-og.png',
         width: 1200,
         height: 630,
-        alt: 'Blog - Holy Church',
+        alt: 'Blog - Holy Church Assembly',
       },
     ],
     type: 'website',

@@ -63,7 +63,7 @@ const Footer = () => {
             </Link>
 
             <Link
-              href='https://www.facebook.com/share/1DsHpqomw1/'
+              href='https://www.facebook.com/share/1EqsE3QsD6/'
               target='_blank'
               rel='noopener noreferrer'
             >
@@ -85,48 +85,62 @@ const Footer = () => {
           <ul className='flex flex-col gap-3'>
             <li>
               <Link
-                href={'/'}
+                href={'/sermons'}
                 className='text-gray-600 text-[.9rem] font-sans font-normal hover:text-gray-900'
               >
-                Home
+                Sermons
               </Link>
             </li>
             <li>
               <Link
-                href={'/courses'}
+                href={'/events'}
                 className='text-gray-600 text-[.9rem] font-sans font-normal hover:text-gray-900'
               >
-                Courses
+                Events
               </Link>
             </li>
             <li>
               <Link
-                href={'/services'}
+                href={'/blog'}
                 className='text-gray-600 text-[.9rem] font-sans font-normal hover:text-gray-900'
               >
-                Services
+                Blog
               </Link>
             </li>
             <li>
               <Link
-                href={'/gallery'}
+                href={'/give'}
                 className='text-gray-600 text-[.9rem] font-sans font-normal hover:text-gray-900'
               >
-                Gallery
+                Donate
               </Link>
             </li>
-
             <li>
               <Link
-                href={'/contact'}
+                href={'/prayer-requests'}
                 className='text-gray-600 text-[.9rem] font-sans font-normal hover:text-gray-900'
               >
-                Contact
+                Prayer Requests
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={'/podcasts'}
+                className='text-gray-600 text-[.9rem] font-sans font-normal hover:text-gray-900'
+              >
+                Podcasts
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={'/contact-us'}
+                className='text-gray-600 text-[.9rem] font-sans font-normal hover:text-gray-900'
+              >
+                Contact Us
               </Link>
             </li>
           </ul>
         </div>
-        {/* Column 4 - Contact Us */}
         {/* Column 4 - Contact Us */}
         <div>
           <h3 className='font-semibold mb-4 text-gray-900'>

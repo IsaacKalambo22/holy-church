@@ -44,11 +44,8 @@ const bebasNeue = localFont({
 });
 
 export const metadata: Metadata = {
-  title:
-    'Holy Church Assembly',
-  description:
-    'A body known as ',
-  
+  title: 'Holy Church Assembly',
+  description: 'Holy Church Assembly: A beacon of faith, community, and spiritual growth.',
 };
 
 const RootLayout = async ({
@@ -75,7 +72,7 @@ const RootLayout = async ({
             {/* Canonical URL */}
             <link
               rel='canonical'
-              href='https://identityimpacthub.com'
+              href='https://holychurch.com'
             />
             <link
               rel='icon'
@@ -84,19 +81,19 @@ const RootLayout = async ({
             {/* Open Graph Meta Tags */}
             <meta
               property='og:title'
-              content='Identity Impact Hub | Revealing the hidden potential'
+              content='Holy Church Assembly | A Beacon of Faith and Community'
             />
             <meta
               property='og:description'
-              content='Join a vibrant network of innovators, leaders, and changemakers. Identity Impact Hub is a catalyst for social and entrepreneurial impact.'
+              content='A global community dedicated to spiritual growth, community building, and positive impact.'
             />
             <meta
               property='og:url'
-              content='https://identityimpacthub.com'
+              content='https://holychurch.com'
             />
             <meta
               property='og:image'
-              content='https://identityimpacthub.com/assets/images/logo.png'
+              content='https://holychurch.com/assets/images/logo.png'
             />
             <meta
               property='og:type'
@@ -104,7 +101,7 @@ const RootLayout = async ({
             />
             <meta
               property='og:site_name'
-              content='Identity Impact Hub'
+              content='Holy Church Assembly'
             />
             {/* Twitter Card Meta Tags */}
             <meta
@@ -113,23 +110,23 @@ const RootLayout = async ({
             />
             <meta
               name='twitter:title'
-              content='Identity Impact Hub | Revealing the hidden potential'
+              content='Holy Church Assembly | A Beacon of Faith and Community'
             />
             <meta
               name='twitter:description'
-              content='A global hub for innovators, leaders, and change-makers dedicated to social impact and sustainability.'
+              content='A global community dedicated to spiritual growth, community building, and positive impact.'
             />
             <meta
               name='twitter:image'
-              content='https://identityimpacthub.com/assets/images/og-image.png'
+              content='https://holychurch.com/assets/images/og-image.png'
             />
             <meta
               name='twitter:site'
-              content='@IdentityImpact'
+              content='@HolyChurchAssembly'
             />
             <meta
               name='twitter:creator'
-              content='@IdentityImpact'
+              content='@HolyChurchAssembly'
             />
           </head>
           <body
