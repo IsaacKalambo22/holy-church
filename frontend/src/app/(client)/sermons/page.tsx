@@ -1,4 +1,7 @@
 import type { Metadata } from 'next';
+import { fetchSermons } from '@/modules/client/sermons/actions';
+import { SermonGrid } from '@/modules/client/sermons/components/SermonGrid';
+import { SermonSearch } from '@/modules/client/sermons/components/SermonSearch';
 
 export const metadata: Metadata = {
   title: 'Sermons | Holy Church',
@@ -29,7 +32,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SermonsPage() {
+interface SermonsPageProps {
+  searchParams: {
+    search?: string;
+    category?: string;
+    preacher?: string;
+    page?: string;
+  };
+}
+
+export default async function SermonsPage({ searchParams }: SermonsPageProps) {
+  const { search, category, preacher, page } = searchParams;
+  
+  const response = await fetchSermons({ 
+    search,
+    category,
+    preacher,
+    page: page ? parseInt(page) : 1,
+    limit: 9 
+  });
+  
+  const sermons = response.success ? response.data.sermons : [];
+  
   return (
     <div className="py-12">
       <div className="text-center mb-12">
@@ -39,10 +63,42 @@ export default function SermonsPage() {
         </p>
       </div>
       
-      {/* Sermons Grid will be implemented here */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Sermon cards will be mapped here */}
-      </div>
+      <SermonSearch />
+      
+      {sermons.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No sermons available matching your criteria. Please try a different search.</p>
+        </div>
+      ) : (
+        <>
+          <SermonGrid sermons={sermons} />
+          
+          {response.success && response.data.totalPages > 1 && (
+            <div className="mt-12 flex justify-center">
+              <div className="flex space-x-2">
+                {Array.from({ length: response.data.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <a
+                    key={pageNum}
+                    href={`/sermons?${new URLSearchParams({
+                      ...(search ? { search } : {}),
+                      ...(category ? { category } : {}),
+                      ...(preacher ? { preacher } : {}),
+                      page: pageNum.toString(),
+                    }).toString()}`}
+                    className={`px-4 py-2 rounded-md ${
+                      pageNum === (page ? parseInt(page) : 1)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {pageNum}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

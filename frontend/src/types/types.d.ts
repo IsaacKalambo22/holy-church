@@ -57,6 +57,23 @@ declare global {
     updatedAt: string;
   }
 
+  interface Sermon {
+    id: string;
+    title: string;
+    description: string;
+    preacher: string;
+    date: string;
+    videoUrl?: string;
+    audioUrl?: string;
+    thumbnailUrl: string;
+    duration: string;
+    category?: string;
+    tags?: string[];
+    isPublished: boolean;
+    createdAt: string;
+    updatedAt: string;
+  }
+
   interface Student {
     id: string;
     userId: string;

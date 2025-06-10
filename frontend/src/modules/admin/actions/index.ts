@@ -370,3 +370,56 @@ export const deleteGallery = async (
     [fullPath, layout]
   );
 };
+
+// Sermon SERVER ACTIONS
+export const createSermon = async (
+  payload: object,
+  fullPath: string,
+  layout: string
+) => {
+  return await serverAction(
+    'sermons',
+    'POST',
+    payload,
+    [fullPath, layout, '/sermons'] // Revalidate paths
+  );
+};
+
+export const updateSermon = async (
+  payload: object,
+  id: string,
+  fullPath: string
+) => {
+  return await serverAction(
+    `sermons/${id}`,
+    'PATCH',
+    payload,
+    [fullPath, '/sermons', `/sermons/${id}`]
+  );
+};
+
+export const deleteSermon = async (
+  id: string,
+  fullPath: string,
+  layout: string
+) => {
+  return await serverAction(
+    `sermons/${id}`,
+    'DELETE',
+    null,
+    [fullPath, layout, '/sermons']
+  );
+};
+
+export const publishSermon = async (
+  id: string,
+  isPublished: boolean,
+  fullPath: string
+) => {
+  return await serverAction(
+    `sermons/${id}/publish`,
+    'PATCH',
+    { isPublished },
+    [fullPath, '/sermons', `/sermons/${id}`]
+  );
+};
