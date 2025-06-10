@@ -22,7 +22,7 @@ interface ImageSliderProps {
 }
 
 const ImageSlider = ({
-  urls,
+  urls = [],
   maxHeight = 19,
 }: ImageSliderProps) => {
   const [swiper, setSwiper] =
@@ -32,7 +32,7 @@ const ImageSlider = ({
 
   const [slideConfig, setSlideConfig] = useState({
     isBeginning: true,
-    isEnd: activeIndex === (urls.length ?? 0) - 1,
+    isEnd: activeIndex === (urls.length - 1),
   });
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const ImageSlider = ({
           isBeginning: activeIndex === 0,
           isEnd:
             activeIndex ===
-            (urls.length ?? 0) - 1,
+            (urls.length - 1),
         });
       }
     );
