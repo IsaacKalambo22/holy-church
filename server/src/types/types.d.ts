@@ -1,8 +1,4 @@
-import { PrismaClient } from "../../prisma/generated/prisma";
 
-declare global {
-  var prisma: PrismaClient | undefined;
-}
 
 // API Response Type
 export interface APIResponse {
@@ -12,9 +8,19 @@ export interface APIResponse {
 }
 
 // Token Payload Type (for authentication)
+export enum Role {
+  ADMIN = "ADMIN",
+  SUPER_ADMIN = "SUPER_ADMIN",
+  MANAGER = "MANAGER",
+  USER = "USER",
+  STUDENT = "STUDENT",
+  TEACHER = "TEACHER",
+}
+
 export interface TokenPayloadProps {
-  id: string;
-  email: string;
+  id: string
+  email: string
+  role: Role[]
 }
 
 // User Type

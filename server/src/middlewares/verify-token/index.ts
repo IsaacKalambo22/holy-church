@@ -64,7 +64,7 @@ export const verifyAdmin = (
   next: NextFunction
 ): void => {
   verifyToken(req, res, () => {
-    if (req.user?.role === Role.ADMIN) {
+    if (req.user?.role.some(role => role === Role.ADMIN)) {
       return next();
     } else {
       return res.status(403).json({
@@ -80,7 +80,7 @@ export const verifyManager = (
   next: NextFunction
 ): void => {
   verifyToken(req, res, () => {
-    if (req.user?.role === Role.MANAGER) {
+    if (req.user?.role.some(role => role === Role.MANAGER)) {
       return next();
     } else {
       return res.status(403).json({
@@ -97,8 +97,7 @@ export const verifyAdminAndManager = (
 ): void => {
   verifyToken(req, res, () => {
     if (
-      req.user?.role === Role.MANAGER ||
-      req.user?.role === Role.ADMIN
+      req.user?.role.some(role => role === Role.MANAGER || role === Role.ADMIN)
     ) {
       return next();
     } else {
