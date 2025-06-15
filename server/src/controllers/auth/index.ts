@@ -13,6 +13,30 @@ import { APIResponse } from '../../types/types';
 import { generateTokens } from '../../utils';
 import { Role, prisma } from '../../lib';
 
+export const bootstrapSuperAdmin = async (
+  email: string,
+  password: string
+): Promise<void> => {
+  const existingAdmin = await prisma.user.findFirst({
+    where: { roles: { has: Role.SUPER_ADMIN } },
+  })
+
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash(password, 10)
+    await prisma.user.create({
+      data: {
+        name: "Super Admin",
+        email,
+        password: hashedPassword,
+        roles: [Role.SUPER_ADMIN],
+      },
+    })
+
+    console.log("✅ Super Admin user created automatically.")
+  } else {
+    console.log("🛡️ Super Admin user already exists.")
+  }
+}
 
 export const registerUser = async (
   req: Request,

@@ -12,13 +12,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshToken = exports.verifyEmail = exports.forgotPassword = exports.resetPassword = exports.setPassword = exports.login = exports.registerUser = void 0;
+exports.refreshToken = exports.verifyEmail = exports.forgotPassword = exports.resetPassword = exports.setPassword = exports.login = exports.registerUser = exports.bootstrapSuperAdmin = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const emails_1 = require("../../nodemailer/emails");
 const utils_1 = require("../../utils");
 const lib_1 = require("../../lib");
+const bootstrapSuperAdmin = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingAdmin = yield lib_1.prisma.user.findFirst({
+        where: { roles: { has: lib_1.Role.SUPER_ADMIN } },
+    });
+    if (!existingAdmin) {
+        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
+        yield lib_1.prisma.user.create({
+            data: {
+                name: "Super Admin",
+                email,
+                password: hashedPassword,
+                roles: [lib_1.Role.SUPER_ADMIN],
+            },
+        });
+        console.log("✅ Super Admin user created automatically.");
+    }
+    else {
+        console.log("🛡️ Super Admin user already exists.");
+    }
+});
+exports.bootstrapSuperAdmin = bootstrapSuperAdmin;
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, role, phoneNumber, password, } = req.body;
     // Validate user input

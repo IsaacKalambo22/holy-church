@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyAdminAndManager = exports.verifyManager = exports.verifyAdmin = exports.verifyToken = void 0;
-const client_1 = require("@prisma/client");
+const prisma_1 = require("../../../prisma/generated/prisma");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // Middleware to verify JWT and add user information to the request object
 const verifyToken = (req, res, next) => {
@@ -34,7 +34,7 @@ exports.verifyToken = verifyToken;
 const verifyAdmin = (req, res, next) => {
     (0, exports.verifyToken)(req, res, () => {
         var _a;
-        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === client_1.Role.ADMIN) {
+        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === prisma_1.Role.ADMIN) {
             return next();
         }
         else {
@@ -48,7 +48,7 @@ exports.verifyAdmin = verifyAdmin;
 const verifyManager = (req, res, next) => {
     (0, exports.verifyToken)(req, res, () => {
         var _a;
-        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === client_1.Role.MANAGER) {
+        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === prisma_1.Role.MANAGER) {
             return next();
         }
         else {
@@ -62,8 +62,8 @@ exports.verifyManager = verifyManager;
 const verifyAdminAndManager = (req, res, next) => {
     (0, exports.verifyToken)(req, res, () => {
         var _a, _b;
-        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === client_1.Role.MANAGER ||
-            ((_b = req.user) === null || _b === void 0 ? void 0 : _b.role) === client_1.Role.ADMIN) {
+        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === prisma_1.Role.MANAGER ||
+            ((_b = req.user) === null || _b === void 0 ? void 0 : _b.role) === prisma_1.Role.ADMIN) {
             return next();
         }
         else {
