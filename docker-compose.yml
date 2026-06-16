@@ -1,37 +1,38 @@
 services:
-  wealth-bridge-web:
-    container_name: wealth-bridge-web
+  holy-church:
+    container_name: holy-church
     build:
       context: .
-      dockerfile: ./apps/web/Dockerfile
-      args:
-        NEXT_PUBLIC_API_ENDPOINT: http://wealth-bridge-api:8003
-
-    image: wealth-bridge-web
+      dockerfile: Dockerfile
+    image: holy-church
     restart: unless-stopped
     ports:
-      - 3003:3003
+      - 3000:3000
     networks:
       - app_network
     env_file:
-      - ./apps/web/.env.prod
+      - .env
+    depends_on:
+      - postgres
 
-  wealth-bridge-api:
-    container_name: wealth-bridge-api
-    build:
-      context: .
-      dockerfile: ./apps/api/Dockerfile
-    image: wealth-bridge-api
+  postgres:
+    container_name: holy-church-db
+    image: postgres:15-alpine
     restart: unless-stopped
+    environment:
+      POSTGRES_USER: holychurch
+      POSTGRES_PASSWORD: holychurch
+      POSTGRES_DB: holy_church
     ports:
-      - 8003:8003
+      - 5432:5432
     networks:
       - app_network
-    env_file:
-      - ./apps/api/.env.prod
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
 networks:
   app_network:
-    external: true
+    driver: bridge
+
+volumes:
+  postgres_data:
