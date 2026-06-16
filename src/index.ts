@@ -20,7 +20,7 @@ const port = Number(process.env.PORT) || 3000
 
 const app = new Elysia({ adapter: node() })
   .use(cors())
-  .use(staticPlugin())
+  .use(staticPlugin({ assets: 'public', prefix: '/' }))
   .use(cookie())
   .use(
     jwt({
