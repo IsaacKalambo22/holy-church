@@ -3,6 +3,7 @@ import { cors } from '@elysiajs/cors'
 import { staticPlugin } from '@elysiajs/static'
 import { cookie } from '@elysiajs/cookie'
 import { jwt } from '@elysiajs/jwt'
+import { node } from '@elysiajs/node'
 
 import { authRoutes } from './routes/auth'
 import { sermonRoutes } from './routes/sermons'
@@ -13,9 +14,11 @@ import { blogRoutes } from './routes/blog'
 import { prayerRoutes } from './routes/prayer'
 import { podcastRoutes } from './routes/podcasts'
 import { adminRoutes } from './routes/admin'
-import { pageRoutes } from './routes/pages'
+import { pageRoutes } from './routes/pages/index'
 
-const app = new Elysia()
+const port = Number(process.env.PORT) || 3000
+
+const app = new Elysia({ adapter: node() })
   .use(cors())
   .use(staticPlugin())
   .use(cookie())
@@ -36,6 +39,6 @@ const app = new Elysia()
   .use(podcastRoutes)
   .use(adminRoutes)
   .use(pageRoutes)
-  .listen(process.env.PORT || 3000)
+  .listen(port)
 
-console.log(`🦊 Elysia is running at http://localhost:${app.server?.port}`)
+console.log(`🦊 Elysia is running at http://localhost:${port}`)

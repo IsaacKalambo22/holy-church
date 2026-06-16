@@ -1,9 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Supabase credentials are not set')
+    return null
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey)
+}
 
 const BUCKET_NAME = process.env.BUCKET_NAME || 'holy-church'
 
@@ -12,6 +19,11 @@ export async function uploadToSupabase(
   file: File | Buffer,
   contentType: string
 ) {
+  const supabase = getSupabaseClient()
+  if (!supabase) {
+    throw new Error('Supabase client not initialized')
+  }
+
   const { data, error } = await supabase.storage
     .from(BUCKET_NAME)
     .upload(key, file, {
@@ -31,6 +43,11 @@ export async function uploadToSupabase(
 }
 
 export async function deleteFromSupabase(key: string) {
+  const supabase = getSupabaseClient()
+  if (!supabase) {
+    throw new Error('Supabase client not initialized')
+  }
+
   const { error } = await supabase.storage
     .from(BUCKET_NAME)
     .remove([key])
@@ -41,6 +58,11 @@ export async function deleteFromSupabase(key: string) {
 }
 
 export async function getPublicUrl(key: string) {
+  const supabase = getSupabaseClient()
+  if (!supabase) {
+    throw new Error('Supabase client not initialized')
+  }
+
   const { data } = supabase.storage
     .from(BUCKET_NAME)
     .getPublicUrl(key)
