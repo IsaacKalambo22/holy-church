@@ -40,12 +40,13 @@ model User {
   @@index([deletedAt])
   @@map("users")
 
-  sermons        Sermon[]
-  donations      Donation[]
-  blogPosts      Blog[]
-  prayerRequests PrayerRequest[]
-  podcasts       Podcast[]
-  ministries     Ministry[]
+  sermons           Sermon[]
+  donations         Donation[]
+  blogPosts         Blog[]
+  prayerRequests    PrayerRequest[]
+  podcasts          Podcast[]
+  ministries        Ministry[]
+  preferences       MemberPreference[]
 }
 
 model Sermon {
@@ -331,6 +332,23 @@ model Ministry {
   @@index([category])
   @@index([status])
   @@map("ministries")
+}
+
+model MemberPreference {
+  id                      String   @id @default(uuid())
+  userId                  String   @unique
+  user                    User     @relation(fields: [userId], references: [id])
+  emailNotifications      Boolean  @default(true)
+  smsNotifications        Boolean  @default(false)
+  newsletterSubscription  Boolean  @default(true)
+  showProfile             Boolean  @default(true)
+  showEmail               Boolean  @default(false)
+  showPhone               Boolean  @default(false)
+  createdAt               DateTime @default(now()) @db.Timestamptz
+  updatedAt               DateTime @updatedAt @db.Timestamptz
+
+  @@index([userId])
+  @@map("member_preferences")
 }
 
 model ContactMessage {

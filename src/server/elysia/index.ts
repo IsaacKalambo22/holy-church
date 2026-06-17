@@ -12,6 +12,7 @@ import { blogRoutes } from './routes/blog'
 import { donationRoutes } from './routes/donations'
 import { galleryRoutes } from './routes/gallery'
 import { contactRoutes } from './routes/contact'
+import { memberRoutes } from './routes/member'
 
 export const app = new Elysia({ prefix: '/api' })
   .use(errorHandler)
@@ -39,3 +40,4 @@ export const app = new Elysia({ prefix: '/api' })
   .use(donationRoutes)
   .use(galleryRoutes)
   .use(contactRoutes)
+  .use(memberRoutes)
