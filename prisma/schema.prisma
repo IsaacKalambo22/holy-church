@@ -2,8 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  output   = "../src/prisma/generated"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -35,34 +34,40 @@ model User {
   createdAt                  DateTime  @default(now())
   updatedAt                  DateTime  @updatedAt
 
-  sermons     Sermon[]
-  donations   Donation[]
-  blogPosts   Blog[]
+  sermons        Sermon[]
+  donations      Donation[]
+  blogPosts      Blog[]
   prayerRequests PrayerRequest[]
-  podcasts    Podcast[]
+  podcasts       Podcast[]
+  ministries     Ministry[]
 }
 
 model Sermon {
-  id          String  @id @default(uuid())
-  title       String
-  description String?
-  date        DateTime @default(now())
-  videoUrl    String?
-  audioUrl    String?
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  date         DateTime @default(now())
+  videoUrl     String?
+  audioUrl     String?
   thumbnailUrl String?
-  preacher    User?     @relation(fields: [preacherId], references: [id])
-  preacherId  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  series       String?
+  published    Boolean  @default(false)
+  views        Int      @default(0)
+  preacher     User?    @relation(fields: [preacherId], references: [id])
+  preacherId   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Event {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   description String?
   date        DateTime
+  endDate     DateTime?
   location    String?
   imageUrl    String?
+  category    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -106,17 +111,45 @@ model PrayerRequest {
 }
 
 model Podcast {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  audioUrl    String?
-  videoUrl    String?
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  audioUrl     String?
+  videoUrl     String?
   thumbnailUrl String?
-  duration    Int?      // Duration in seconds
-  speaker     User?     @relation(fields: [speakerId], references: [id])
-  speakerId   String?
-  published   Boolean   @default(false)
-  publishedAt DateTime @default(now())
+  duration     Int?
+  speaker      User?    @relation(fields: [speakerId], references: [id])
+  speakerId    String?
+  published    Boolean  @default(false)
+  publishedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Ministry {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  imageUrl    String?
+  leader      User?    @relation(fields: [leaderId], references: [id])
+  leaderId    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
