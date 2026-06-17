@@ -27,12 +27,11 @@ export default function AdminMembersPage() {
   useEffect(() => {
     async function loadMembers() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
         const params = new URLSearchParams()
         if (search) params.append('search', search)
         if (roleFilter) params.append('role', roleFilter)
 
-        const response = await fetch(`${baseUrl}/api/admin/members?${params}`)
+        const response = await fetch(`/api/admin/members?${params}`)
         if (response.ok) {
           const result = await response.json()
           setMembers(result.data || [])

@@ -45,8 +45,7 @@ export function VolunteerSignupForm({ ministryId, onSuccess }: VolunteerSignupFo
     setSubmitError(null)
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      const response = await fetch(`${baseUrl}/api/ministries/${ministryId}/volunteer`, {
+      const response = await fetch(`/api/ministries/${ministryId}/volunteer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

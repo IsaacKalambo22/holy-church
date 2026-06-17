@@ -76,8 +76,7 @@ export function GlobalSearch() {
       if (query.length >= 2) {
         setLoading(true)
         try {
-          const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-          const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(query)}&limit=8`)
+          const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=8`)
           if (response.ok) {
             const data = await response.json()
             setResults(data.data?.results || [])

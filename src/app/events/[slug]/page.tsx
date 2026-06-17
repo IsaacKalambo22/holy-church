@@ -8,8 +8,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getEvent(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/events/slug/${slug}`, {
+  const response = await fetch(`/api/events/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -38,12 +37,11 @@ async function getEvent(slug: string) {
 }
 
 async function getRelatedEvents(category?: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const params = new URLSearchParams()
   params.set('limit', '4')
   if (category) params.set('category', category)
   
-  const response = await fetch(`${baseUrl}/api/events?${params.toString()}`, {
+  const response = await fetch(`/api/events?${params.toString()}`, {
     cache: 'no-store',
   })
 

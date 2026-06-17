@@ -7,8 +7,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getSermon(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/sermons/slug/${slug}`, {
+  const response = await fetch(`/api/sermons/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -21,12 +20,11 @@ async function getSermon(slug: string) {
 }
 
 async function getRelatedSermons(sermonId: string, series?: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const params = new URLSearchParams()
   params.set('limit', '4')
   if (series) params.set('series', series)
   
-  const response = await fetch(`${baseUrl}/api/sermons?${params.toString()}`, {
+  const response = await fetch(`/api/sermons?${params.toString()}`, {
     cache: 'no-store',
   })
 

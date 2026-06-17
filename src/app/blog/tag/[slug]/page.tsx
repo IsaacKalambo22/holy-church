@@ -5,8 +5,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getTag(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/blog/tags`, {
+  const response = await fetch(`/api/blog/tags`, {
     cache: 'no-store',
   })
 
@@ -24,8 +23,7 @@ async function getBlogPosts(page: string = '1') {
   params.set('page', page)
   params.set('limit', '9')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
+  const response = await fetch(`/api/blog?${params.toString()}`, {
     cache: 'no-store',
   })
 

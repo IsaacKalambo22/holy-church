@@ -5,8 +5,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getAlbum(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/gallery/albums/slug/${slug}`, {
+  const response = await fetch(`/api/gallery/albums/slug/${slug}`, {
     cache: 'no-store',
   })
 

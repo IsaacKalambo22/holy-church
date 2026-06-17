@@ -27,11 +27,10 @@ export default function MemberNotificationsPage() {
   useEffect(() => {
     async function loadNotifications() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
         const params = new URLSearchParams()
         if (filter === 'unread') params.append('unreadOnly', 'true')
 
-        const response = await fetch(`${baseUrl}/api/notifications?${params}`)
+        const response = await fetch(`/api/notifications?${params}`)
         if (response.ok) {
           const result = await response.json()
           setNotifications(result.data || [])
@@ -48,8 +47,7 @@ export default function MemberNotificationsPage() {
 
   const markAsRead = async (id: string) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      await fetch(`${baseUrl}/api/notifications/${id}/read`, { method: 'PATCH' })
+      await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
       setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)))
       setUnreadCount(Math.max(0, unreadCount - 1))
     } catch {
@@ -59,8 +57,7 @@ export default function MemberNotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      await fetch(`${baseUrl}/api/notifications/read-all`, { method: 'PATCH' })
+      await fetch(`/api/notifications/read-all`, { method: 'PATCH' })
       setNotifications(notifications.map((n) => ({ ...n, read: true })))
       setUnreadCount(0)
     } catch {
@@ -70,8 +67,7 @@ export default function MemberNotificationsPage() {
 
   const deleteNotification = async (id: string) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      await fetch(`${baseUrl}/api/notifications/${id}`, { method: 'DELETE' })
+      await fetch(`/api/notifications/${id}`, { method: 'DELETE' })
       setNotifications(notifications.filter((n) => n.id !== id))
       if (!notifications.find((n) => n.id === id)?.read) {
         setUnreadCount(Math.max(0, unreadCount - 1))

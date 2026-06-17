@@ -66,8 +66,7 @@ export function DonationForm({ defaultCategory, onSuccess }: DonationFormProps) 
     setSubmitError(null)
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      const response = await fetch(`${baseUrl}/api/donations`, {
+      const response = await fetch(`/api/donations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -17,8 +17,7 @@ export default function AdminNotificationsPage() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-        const response = await fetch(`${baseUrl}/api/notifications`)
+        const response = await fetch(`/api/notifications`)
         if (response.ok) {
           const result = await response.json()
           setStats({

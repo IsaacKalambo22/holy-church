@@ -7,8 +7,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getMinistry(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/ministries/slug/${slug}`, {
+  const response = await fetch(`/api/ministries/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -34,12 +33,11 @@ async function getMinistry(slug: string) {
 }
 
 async function getRelatedMinistries(category?: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const params = new URLSearchParams()
   params.set('limit', '4')
   if (category) params.set('category', category)
   
-  const response = await fetch(`${baseUrl}/api/ministries?${params.toString()}`, {
+  const response = await fetch(`/api/ministries?${params.toString()}`, {
     cache: 'no-store',
   })
 

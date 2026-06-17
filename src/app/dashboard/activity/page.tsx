@@ -24,8 +24,7 @@ export default function ActivityPage() {
   useEffect(() => {
     async function loadActivities() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-        const response = await fetch(`${baseUrl}/api/member/activity`)
+        const response = await fetch(`/api/member/activity`)
         if (response.ok) {
           const result = await response.json()
           setActivities(result.data || [])

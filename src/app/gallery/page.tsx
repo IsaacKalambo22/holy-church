@@ -19,8 +19,7 @@ async function getAlbums(page: string = '1') {
   params.set('page', page)
   params.set('limit', '12')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/gallery/albums?${params.toString()}`, {
+  const response = await fetch(`/api/gallery/albums?${params.toString()}`, {
     next: { revalidate: 600 },
   })
 

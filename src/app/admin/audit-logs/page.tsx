@@ -33,12 +33,11 @@ export default function AdminAuditLogsPage() {
   useEffect(() => {
     async function loadLogs() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
         const params = new URLSearchParams()
         if (search) params.append('search', search)
         if (actionFilter) params.append('action', actionFilter)
 
-        const response = await fetch(`${baseUrl}/api/admin/audit-logs?${params}`)
+        const response = await fetch(`/api/admin/audit-logs?${params}`)
         if (response.ok) {
           const result = await response.json()
           setLogs(result.data || [])

@@ -49,8 +49,7 @@ export function PrayerRequestForm({ onSuccess }: PrayerRequestFormProps) {
     setSubmitError(null)
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      const response = await fetch(`${baseUrl}/api/prayer`, {
+      const response = await fetch(`/api/prayer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

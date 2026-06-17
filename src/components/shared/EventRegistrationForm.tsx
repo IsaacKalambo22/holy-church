@@ -43,8 +43,7 @@ export function EventRegistrationForm({ eventId, onSuccess }: EventRegistrationF
     setSubmitError(null)
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      const response = await fetch(`${baseUrl}/api/events/${eventId}/register`, {
+      const response = await fetch(`/api/events/${eventId}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

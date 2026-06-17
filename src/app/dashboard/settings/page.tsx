@@ -23,8 +23,7 @@ export default function SettingsPage() {
   useEffect(() => {
     async function loadPreferences() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-        const response = await fetch(`${baseUrl}/api/member/preferences`)
+        const response = await fetch(`/api/member/preferences`)
         if (response.ok) {
           const result = await response.json()
           if (result.data) {

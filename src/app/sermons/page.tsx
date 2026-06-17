@@ -34,8 +34,7 @@ async function getSermons(searchParams: {
   params.set('page', searchParams.page || '1')
   params.set('limit', '12')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/sermons?${params.toString()}`, {
+  const response = await fetch(`/api/sermons?${params.toString()}`, {
     next: { revalidate: 300 },
   })
 

@@ -16,12 +16,11 @@ interface SearchResult {
 }
 
 async function getSearchResults(query: string, type?: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const params = new URLSearchParams()
   params.append('q', query)
   if (type) params.append('type', type)
 
-  const response = await fetch(`${baseUrl}/api/search?${params}`, {
+  const response = await fetch(`/api/search?${params}`, {
     cache: 'no-store',
   })
 

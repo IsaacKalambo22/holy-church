@@ -29,8 +29,7 @@ async function getBlogPosts(searchParams: {
   params.set('page', searchParams.page || '1')
   params.set('limit', '9')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
+  const response = await fetch(`/api/blog?${params.toString()}`, {
     next: { revalidate: 300 },
   })
 
@@ -42,8 +41,7 @@ async function getBlogPosts(searchParams: {
 }
 
 async function getCategories() {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/blog/categories`, {
+  const response = await fetch(`/api/blog/categories`, {
     next: { revalidate: 3600 },
   })
 

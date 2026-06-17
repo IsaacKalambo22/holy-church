@@ -6,8 +6,7 @@ import { Calendar, Heart, BookOpen, User, Settings, LogOut, TrendingUp } from 'l
 import Link from 'next/link'
 
 async function getDashboardData(userId: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/member/dashboard`, {
+  const response = await fetch(`/api/member/dashboard`, {
     cache: 'no-store',
     headers: {
       Cookie: `session=${userId}`,

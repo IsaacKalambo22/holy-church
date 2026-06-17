@@ -34,8 +34,7 @@ async function getEvents(searchParams: {
   params.set('page', searchParams.page || '1')
   params.set('limit', '10')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/events?${params.toString()}`, {
+  const response = await fetch(`/api/events?${params.toString()}`, {
     next: { revalidate: 300 },
   })
 

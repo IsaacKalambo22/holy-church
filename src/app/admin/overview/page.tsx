@@ -8,8 +8,7 @@ async function getAdminOverview() {
   const session = await getSession()
   if (!session) return null
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/admin/overview`, {
+  const response = await fetch(`/api/admin/overview`, {
     cache: 'no-store',
     headers: {
       Authorization: `Bearer ${session.token}`,

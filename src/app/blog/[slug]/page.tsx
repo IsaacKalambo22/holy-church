@@ -7,8 +7,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getBlogPost(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/blog/slug/${slug}`, {
+  const response = await fetch(`/api/blog/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -35,13 +34,12 @@ async function getBlogPost(slug: string) {
 async function getRelatedPosts(categoryId?: string) {
   if (!categoryId) return []
   
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const params = new URLSearchParams()
   params.set('published', 'true')
   params.set('categoryId', categoryId)
   params.set('limit', '4')
   
-  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
+  const response = await fetch(`/api/blog?${params.toString()}`, {
     cache: 'no-store',
   })
 

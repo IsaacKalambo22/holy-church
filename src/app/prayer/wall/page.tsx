@@ -28,8 +28,7 @@ async function getPrayers(searchParams: {
   params.set('page', searchParams.page || '1')
   params.set('limit', '20')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/prayer?${params.toString()}`, {
+  const response = await fetch(`/api/prayer?${params.toString()}`, {
     next: { revalidate: 60 },
   })
 

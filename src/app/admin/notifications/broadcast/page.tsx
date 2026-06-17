@@ -46,8 +46,7 @@ export default function AdminBroadcastPage() {
 
     setSending(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      const response = await fetch(`${baseUrl}/api/notifications/broadcast`, {
+      const response = await fetch(`/api/notifications/broadcast`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

@@ -32,8 +32,7 @@ async function getMinistries(searchParams: {
   params.set('page', searchParams.page || '1')
   params.set('limit', '10')
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-  const response = await fetch(`${baseUrl}/api/ministries?${params.toString()}`, {
+  const response = await fetch(`/api/ministries?${params.toString()}`, {
     next: { revalidate: 600 },
   })
 
