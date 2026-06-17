@@ -24,7 +24,7 @@ export async function uploadToSupabase(
     throw new Error('Supabase client not initialized')
   }
 
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from(BUCKET_NAME)
     .upload(key, file, {
       contentType,

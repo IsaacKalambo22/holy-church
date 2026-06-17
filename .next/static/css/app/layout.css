@@ -238,6 +238,7 @@
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     --default-mono-font-family: var(--font-mono);
+    --color-muted: var(--muted);
     --font-heading: var(--font-geist), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   }
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Calendar, MapPin, Clock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = { title: 'Events' }
