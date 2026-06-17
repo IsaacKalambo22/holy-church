@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Heart, BookOpen, User, Settings, LogOut, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import LogoutButton from './LogoutButton'
 
 async function getDashboardData(userId: string) {
   const headersList = await headers()
@@ -176,12 +177,7 @@ export default async function DashboardPage() {
                   Edit Profile
                 </Link>
               </Button>
-              <Button variant="destructive" size="sm" asChild>
-                <Link href="/auth/logout">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
-                </Link>
-              </Button>
+              <LogoutButton />
             </div>
           </CardContent>
         </Card>
@@ -189,3 +185,4 @@ export default async function DashboardPage() {
     </div>
   )
 }
+

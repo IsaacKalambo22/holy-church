@@ -146,7 +146,7 @@ export function GlobalSearch() {
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-2 w-full max-w-2xl bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
+        <div className="absolute top-full right-0 mt-2 w-full max-w-4xl bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
           <div className="flex items-center border-b px-4">
             <Search className="w-5 h-5 text-muted-foreground mr-3" />
             <Input
