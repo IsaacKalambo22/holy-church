@@ -13,6 +13,7 @@ import { donationRoutes } from './routes/donations'
 import { galleryRoutes } from './routes/gallery'
 import { contactRoutes } from './routes/contact'
 import { memberRoutes } from './routes/member'
+import { adminRoutes } from './routes/admin'
 
 export const app = new Elysia({ prefix: '/api' })
   .use(errorHandler)
@@ -41,3 +42,4 @@ export const app = new Elysia({ prefix: '/api' })
   .use(galleryRoutes)
   .use(contactRoutes)
   .use(memberRoutes)
+  .use(adminRoutes)

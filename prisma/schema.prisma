@@ -13,6 +13,10 @@ datasource db {
 enum Role {
   SUPER_ADMIN
   ADMIN
+  PASTOR
+  MINISTRY_LEADER
+  CONTENT_MANAGER
+  FINANCE_MANAGER
   MEMBER
 }
 
@@ -47,6 +51,7 @@ model User {
   podcasts          Podcast[]
   ministries        Ministry[]
   preferences       MemberPreference[]
+  auditLogs         AuditLog[]
 }
 
 model Sermon {
@@ -349,6 +354,25 @@ model MemberPreference {
 
   @@index([userId])
   @@map("member_preferences")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String
+  actor     User     @relation(fields: [actorId], references: [id])
+  action    String
+  entity    String?
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@index([actorId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
 }
 
 model ContactMessage {
