@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/auth-middleware'
+import { DashboardLayout as DashboardShell } from '@/components/dashboard/DashboardLayout'
 
 export default async function DashboardLayout({
   children,
@@ -12,5 +13,9 @@ export default async function DashboardLayout({
     redirect('/auth/login')
   }
 
-  return <>{children}</>
+  return (
+    <DashboardShell title="Dashboard" subtitle="Welcome to your member dashboard">
+      {children}
+    </DashboardShell>
+  )
 }

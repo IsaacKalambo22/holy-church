@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth-middleware'
+import { DashboardLayout as DashboardShell } from '@/components/dashboard/DashboardLayout'
 
 export default async function AdminLayout({
   children,
@@ -12,5 +13,9 @@ export default async function AdminLayout({
     redirect('/auth/login')
   }
 
-  return <>{children}</>
+  return (
+    <DashboardShell title="Admin Dashboard" subtitle="Manage church administration">
+      {children}
+    </DashboardShell>
+  )
 }
