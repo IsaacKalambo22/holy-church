@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from '@/providers/providers'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
+import { StructuredData, createOrganizationSchema, createChurchSchema } from '@/components/seo/StructuredData'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -44,6 +45,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <StructuredData data={createOrganizationSchema()} />
+        <StructuredData data={createChurchSchema()} />
+      </head>
       <body className={`${inter.variable} ${geist.variable} font-sans flex flex-col min-h-screen`}>
         <Providers>
           <Navbar />
