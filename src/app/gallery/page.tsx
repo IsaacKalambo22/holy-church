@@ -1,4 +1,7 @@
 import type { Metadata } from 'next'
+import { Button } from '@/components/ui/button'
+import { AlbumCard } from '@/components/shared/AlbumCard'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Gallery — Holy Church Assembly',
@@ -11,22 +14,31 @@ export const metadata: Metadata = {
   },
 }
 
-const items = [
-  { label: 'Sunday Worship', gradient: 'from-purple-500 to-indigo-600' },
-  { label: 'Church Convention', gradient: 'from-indigo-600 to-purple-700' },
-  { label: 'Youth Night', gradient: 'from-blue-500 to-indigo-600' },
-  { label: 'Community Outreach', gradient: 'from-orange-400 to-rose-500' },
-  { label: 'Baptism Service', gradient: 'from-violet-500 to-purple-600' },
-  { label: 'Prayer Night', gradient: 'from-purple-600 to-violet-700' },
-  { label: 'Missions Trip', gradient: 'from-rose-400 to-orange-500' },
-  { label: "Children's Day", gradient: 'from-yellow-400 to-orange-400' },
-  { label: 'Bible Study', gradient: 'from-green-500 to-teal-500' },
-  { label: 'Leadership Summit', gradient: 'from-indigo-500 to-blue-600' },
-  { label: 'Worship Conference', gradient: 'from-purple-500 to-pink-500' },
-  { label: 'Easter Celebration', gradient: 'from-orange-500 to-amber-400' },
-]
+async function getAlbums(page: string = '1') {
+  const params = new URLSearchParams()
+  params.set('page', page)
+  params.set('limit', '12')
 
-export default function GalleryPage() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/gallery/albums?${params.toString()}`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    return { data: [], total: 0, page: 1, totalPages: 1 }
+  }
+
+  return response.json()
+}
+
+export default async function GalleryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const { data: albums, page, totalPages } = await getAlbums(resolvedSearchParams.page)
+
   return (
     <div className="min-h-screen bg-background">
       <div className="gradient-hero py-20 px-4 text-center">
@@ -35,21 +47,54 @@ export default function GalleryPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-14">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {items.map((item, i) => (
-            <div
-              key={i}
-              className={`relative aspect-square rounded-2xl bg-gradient-to-br ${item.gradient} overflow-hidden group cursor-pointer`}
-            >
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300" />
-              <div className="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="text-white text-sm font-semibold bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-xl">
-                  {item.label}
-                </span>
-              </div>
+        {/* Albums Grid */}
+        {albums.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {albums.map((album: {
+                id: string
+                name: string
+                slug: string
+                description?: string | null
+                coverImage?: string | null
+                _count: { mediaItems: number }
+              }) => (
+                <Link key={album.id} href={`/gallery/${album.slug}`}>
+                  <AlbumCard
+                    name={album.name}
+                    description={album.description}
+                    coverImage={album.coverImage}
+                    mediaCount={album._count.mediaItems}
+                  />
+                </Link>
+              ))}
             </div>
-          ))}
-        </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-10">
+                {page > 1 && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/gallery?page=${Number(page) - 1}`}>Previous</Link>
+                  </Button>
+                )}
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/gallery?page=${Number(page) + 1}`}>Next</Link>
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No albums found.</p>
+            <p className="text-sm text-muted-foreground mt-2">Check back soon for new content!</p>
+          </div>
+        )}
       </div>
     </div>
   )

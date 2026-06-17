@@ -51,7 +51,7 @@ model User {
 model Sermon {
   id           String   @id @default(uuid())
   title        String
-  slug         String   @unique
+  slug         String?  @unique
   description  String?
   date         DateTime @default(now()) @db.Timestamptz
   videoUrl     String?
@@ -77,7 +77,7 @@ model Sermon {
 model Event {
   id                      String   @id @default(uuid())
   title                   String
-  slug                    String   @unique
+  slug                    String?  @unique
   description             String?
   excerpt                 String?
   date                    DateTime @db.Timestamptz
@@ -112,6 +112,57 @@ model Gallery {
 
   @@index([deletedAt])
   @@map("galleries")
+}
+
+model MediaItem {
+  id           String   @id @default(uuid())
+  title        String?
+  description  String?
+  type         String   @default("IMAGE")
+  url          String
+  thumbnailUrl String?
+  albumId      String?
+  album        GalleryAlbum? @relation(fields: [albumId], references: [id])
+  categoryId   String?
+  category     MediaCategory? @relation(fields: [categoryId], references: [id])
+  uploadedBy   String?
+  deletedAt    DateTime? @db.Timestamptz
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  @@index([albumId])
+  @@index([categoryId])
+  @@index([type])
+  @@index([deletedAt])
+  @@map("media_items")
+}
+
+model GalleryAlbum {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  coverImage  String?
+  mediaItems  MediaItem[]
+  deletedAt   DateTime? @db.Timestamptz
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([slug])
+  @@index([deletedAt])
+  @@map("gallery_albums")
+}
+
+model MediaCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  mediaItems MediaItem[]
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  @@index([slug])
+  @@map("media_categories")
 }
 
 model Donation {
@@ -194,7 +245,7 @@ model PrayerRequest {
   userId      String?
   deletedAt   DateTime? @db.Timestamptz
   createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @updatedAt @db.Timestamptz
+  updatedAt   DateTime? @updatedAt @db.Timestamptz
 
   @@index([userId])
   @@index([status])
@@ -229,7 +280,7 @@ model Podcast {
 model Ministry {
   id                String   @id @default(uuid())
   name              String
-  slug              String   @unique
+  slug              String?  @unique
   description       String?
   imageUrl          String?
   category          String?
