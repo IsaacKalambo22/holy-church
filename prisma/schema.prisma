@@ -52,6 +52,7 @@ model User {
   ministries        Ministry[]
   preferences       MemberPreference[]
   auditLogs         AuditLog[]
+  notifications     Notification[]
 }
 
 model Sermon {
@@ -340,17 +341,23 @@ model Ministry {
 }
 
 model MemberPreference {
-  id                      String   @id @default(uuid())
-  userId                  String   @unique
-  user                    User     @relation(fields: [userId], references: [id])
-  emailNotifications      Boolean  @default(true)
-  smsNotifications        Boolean  @default(false)
-  newsletterSubscription  Boolean  @default(true)
-  showProfile             Boolean  @default(true)
-  showEmail               Boolean  @default(false)
-  showPhone               Boolean  @default(false)
-  createdAt               DateTime @default(now()) @db.Timestamptz
-  updatedAt               DateTime @updatedAt @db.Timestamptz
+  id                          String   @id @default(uuid())
+  userId                      String   @unique
+  user                        User     @relation(fields: [userId], references: [id])
+  emailNotifications          Boolean  @default(true)
+  smsNotifications            Boolean  @default(false)
+  newsletterSubscription      Boolean  @default(true)
+  showProfile                 Boolean  @default(true)
+  showEmail                   Boolean  @default(false)
+  showPhone                   Boolean  @default(false)
+  notifyEvents                Boolean  @default(true)
+  notifySermons               Boolean  @default(true)
+  notifyPrayers               Boolean  @default(true)
+  notifyDonations             Boolean  @default(true)
+  notifyBlogs                 Boolean  @default(true)
+  notifyAnnouncements         Boolean  @default(true)
+  createdAt                   DateTime @default(now()) @db.Timestamptz
+  updatedAt                   DateTime @updatedAt @db.Timestamptz
 
   @@index([userId])
   @@map("member_preferences")
@@ -373,6 +380,58 @@ model AuditLog {
   @@index([entity])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+enum NotificationType {
+  SYSTEM
+  EVENT
+  SERMON
+  PRAYER
+  DONATION
+  BLOG
+  ANNOUNCEMENT
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  PUSH
+}
+
+model Notification {
+  id        String               @id @default(uuid())
+  userId    String
+  user      User                 @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      NotificationType
+  channel   NotificationChannel
+  read      Boolean              @default(false)
+  metadata  Json?
+  createdAt DateTime             @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model NotificationTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  type        NotificationType
+  subject     String
+  body        String
+  variables   String[]
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([type])
+  @@index([active])
+  @@map("notification_templates")
 }
 
 model ContactMessage {
