@@ -73,7 +73,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
   )
   .post(
     '/forgot-password',
-    async ({ body, set }) => {
+    async ({ body }) => {
       const { email } = body
       const user = await prisma.user.findUnique({ where: { email } })
       if (!user) {
