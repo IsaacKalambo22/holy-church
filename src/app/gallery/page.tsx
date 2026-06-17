@@ -21,7 +21,7 @@ async function getAlbums(page: string = '1') {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const response = await fetch(`${baseUrl}/api/gallery/albums?${params.toString()}`, {
-    cache: 'no-store',
+    next: { revalidate: 600 },
   })
 
   if (!response.ok) {

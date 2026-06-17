@@ -30,7 +30,7 @@ async function getPrayers(searchParams: {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const response = await fetch(`${baseUrl}/api/prayer?${params.toString()}`, {
-    cache: 'no-store',
+    next: { revalidate: 60 },
   })
 
   if (!response.ok) {

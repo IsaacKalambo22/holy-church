@@ -36,7 +36,7 @@ async function getSermons(searchParams: {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const response = await fetch(`${baseUrl}/api/sermons?${params.toString()}`, {
-    cache: 'no-store',
+    next: { revalidate: 300 },
   })
 
   if (!response.ok) {

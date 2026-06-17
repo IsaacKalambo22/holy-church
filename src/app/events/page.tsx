@@ -36,7 +36,7 @@ async function getEvents(searchParams: {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const response = await fetch(`${baseUrl}/api/events?${params.toString()}`, {
-    cache: 'no-store',
+    next: { revalidate: 300 },
   })
 
   if (!response.ok) {

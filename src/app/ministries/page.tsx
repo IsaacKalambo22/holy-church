@@ -34,7 +34,7 @@ async function getMinistries(searchParams: {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const response = await fetch(`${baseUrl}/api/ministries?${params.toString()}`, {
-    cache: 'no-store',
+    next: { revalidate: 600 },
   })
 
   if (!response.ok) {

@@ -78,6 +78,8 @@ model Sermon {
   @@index([series])
   @@index([slug])
   @@index([deletedAt])
+  @@index([preacherId])
+  @@index([published, date])
   @@map("sermons")
 }
 
@@ -106,6 +108,7 @@ model Event {
   @@index([slug])
   @@index([status])
   @@index([deletedAt])
+  @@index([status, date])
   @@map("events")
 }
 
@@ -194,6 +197,7 @@ model Donation {
   @@index([paymentStatus])
   @@index([createdAt])
   @@index([deletedAt])
+  @@index([donorId, createdAt])
   @@map("donations")
 }
 
@@ -244,6 +248,8 @@ model Blog {
   @@index([status])
   @@index([categoryId])
   @@index([deletedAt])
+  @@index([authorId])
+  @@index([published, publishedAt])
   @@map("blogs")
 }
 
@@ -290,6 +296,7 @@ model PrayerRequest {
   @@index([category])
   @@index([isPublic])
   @@index([deletedAt])
+  @@index([isPublic, status])
   @@map("prayer_requests")
 }
 
@@ -337,6 +344,8 @@ model Ministry {
   @@index([slug])
   @@index([category])
   @@index([status])
+  @@index([leaderId])
+  @@index([status, category])
   @@map("ministries")
 }
 
@@ -415,6 +424,7 @@ model Notification {
   @@index([read])
   @@index([type])
   @@index([createdAt])
+  @@index([userId, read])
   @@map("notifications")
 }
 

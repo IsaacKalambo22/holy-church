@@ -31,7 +31,7 @@ async function getBlogPosts(searchParams: {
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
-    cache: 'no-store',
+    next: { revalidate: 300 },
   })
 
   if (!response.ok) {
@@ -44,7 +44,7 @@ async function getBlogPosts(searchParams: {
 async function getCategories() {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const response = await fetch(`${baseUrl}/api/blog/categories`, {
-    cache: 'no-store',
+    next: { revalidate: 3600 },
   })
 
   if (!response.ok) {
