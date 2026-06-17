@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
-import { Music, Users, Baby, BookOpen, Globe, Heart, Mic2, Cross } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { MinistryCard } from '@/components/shared/MinistryCard'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -15,18 +17,49 @@ export const metadata: Metadata = {
   },
 }
 
-const ministries = [
-  { icon: Music, name: 'Worship Ministry', desc: 'Leading the congregation into the presence of God through anointed music, song, and creative expression. We rehearse weekly and serve every Sunday.', lead: 'Worship Director', color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30' },
-  { icon: Users, name: 'Young Adults', desc: 'A vibrant, relevant ministry for those aged 18–35. We meet weekly for fellowship, discipleship, and fun in a relaxed environment.', lead: 'Young Adults Pastor', color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30' },
-  { icon: Baby, name: "Children's Ministry", desc: 'Building faith foundations for children aged 3–12 through age-appropriate Bible teaching, worship, and creative activities every Sunday.', lead: "Children's Director", color: 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30' },
-  { icon: BookOpen, name: 'Bible Study', desc: 'Deep, systematic study of Scripture every Wednesday evening. All levels welcome — from new believers to seasoned students of the Word.', lead: 'Teaching Pastor', color: 'text-green-600 bg-green-100 dark:bg-green-900/30' },
-  { icon: Globe, name: 'Missions', desc: 'Reaching the unreached through local outreach, national partnerships, and international mission trips. We exist to carry the gospel beyond our walls.', lead: 'Missions Coordinator', color: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30' },
-  { icon: Heart, name: 'Care & Counselling', desc: 'Professional pastoral counselling and peer support for those walking through grief, trauma, addiction, or personal crisis. Confidential and compassionate.', lead: 'Pastoral Care Team', color: 'text-rose-600 bg-rose-100 dark:bg-rose-900/30' },
-  { icon: Mic2, name: 'Media & Creative', desc: 'Serving behind the scenes with video, audio, photography, and design. Help us tell the story of what God is doing through compelling creative work.', lead: 'Media Director', color: 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30' },
-  { icon: Cross, name: 'Prayer Ministry', desc: 'Interceding for the church, city, and nations. Join our Friday night prayer gatherings or our dedicated prayer chain for urgent needs.', lead: 'Prayer Coordinator', color: 'text-violet-600 bg-violet-100 dark:bg-violet-900/30' },
-]
+async function getMinistries(searchParams: {
+  search?: string
+  category?: string
+  status?: string
+  sort?: string
+  page?: string
+}) {
+  const params = new URLSearchParams()
+  if (searchParams.search) params.set('search', searchParams.search)
+  if (searchParams.category) params.set('category', searchParams.category)
+  if (searchParams.status) params.set('status', searchParams.status)
+  if (searchParams.sort) params.set('sort', searchParams.sort)
+  params.set('page', searchParams.page || '1')
+  params.set('limit', '10')
 
-export default function MinistriesPage() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/ministries?${params.toString()}`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    return { data: [], total: 0, page: 1, totalPages: 1 }
+  }
+
+  return response.json()
+}
+
+export default async function MinistriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    search?: string
+    category?: string
+    status?: string
+    sort?: string
+    page?: string
+  }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const { data: ministries, page, totalPages } = await getMinistries(resolvedSearchParams)
+
+  const categories = ['Worship', 'Youth', 'Children', 'Outreach', 'Missions', 'Care', 'Media', 'Prayer', 'Community']
+
   return (
     <div className="min-h-screen bg-background">
       <div className="gradient-hero py-20 px-4 text-center">
@@ -35,29 +68,109 @@ export default function MinistriesPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
-          {ministries.map(({ icon: Icon, name, desc, lead, color }) => (
-            <Card key={name} className="hover:shadow-md hover:-translate-y-0.5 transition-all group">
-              <CardHeader className="pb-3">
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${color} group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">{name}</CardTitle>
-                    <p className="text-xs text-muted-foreground mt-0.5">{lead}</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="leading-relaxed mb-4">{desc}</CardDescription>
-                <Button size="sm" variant="outline">Get Involved</Button>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Search and Filters */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-10">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              className="pl-9" 
+              placeholder="Search ministries..." 
+              defaultValue={resolvedSearchParams.search}
+              name="search"
+            />
+          </div>
+          <div className="flex gap-3">
+            <select 
+              className="h-10 px-3 border border-input rounded-lg bg-background text-sm"
+              name="category"
+              defaultValue={resolvedSearchParams.category}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            <select 
+              className="h-10 px-3 border border-input rounded-lg bg-background text-sm"
+              name="sort"
+              defaultValue={resolvedSearchParams.sort || 'name'}
+            >
+              <option value="name">Alphabetical</option>
+              <option value="newest">Newest</option>
+            </select>
+          </div>
         </div>
 
-        <div className="rounded-3xl gradient-hero p-12 text-center text-white">
+        {/* Active Filters */}
+        {(resolvedSearchParams.search || resolvedSearchParams.category || resolvedSearchParams.status) && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {resolvedSearchParams.search && (
+              <Badge variant="secondary" className="gap-1">
+                Search: {resolvedSearchParams.search}
+              </Badge>
+            )}
+            {resolvedSearchParams.category && (
+              <Badge variant="secondary" className="gap-1">
+                Category: {resolvedSearchParams.category}
+              </Badge>
+            )}
+            {resolvedSearchParams.status && (
+              <Badge variant="secondary" className="gap-1">
+                Status: {resolvedSearchParams.status}
+              </Badge>
+            )}
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/ministries">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
+
+        {/* Ministries Grid */}
+        {ministries.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ministries.map((ministry: { id: string; slug: string; name: string; description?: string | null; imageUrl?: string | null; category?: string | null; leader?: { name: string } | null }) => (
+                <Link key={ministry.id} href={`/ministries/${ministry.slug}`}>
+                  <MinistryCard
+                    name={ministry.name}
+                    description={ministry.description || ''}
+                    imageUrl={ministry.imageUrl}
+                    leader={ministry.leader?.name}
+                  />
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-10">
+                {page > 1 && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/ministries?page=${Number(page) - 1}`}>Previous</Link>
+                  </Button>
+                )}
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/ministries?page=${Number(page) + 1}`}>Next</Link>
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No ministries found matching your criteria.</p>
+            <Button variant="outline" className="mt-4" asChild>
+              <Link href="/ministries">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
+
+        {/* CTA Section */}
+        <div className="rounded-3xl gradient-hero p-12 text-center text-white mt-16">
           <h2 className="font-heading text-3xl font-bold mb-4">Not Sure Where to Start?</h2>
           <p className="text-white/75 text-lg mb-8 max-w-xl mx-auto">
             Take our ministry match survey and we will help connect you with the ministry that best fits your gifts and passions.

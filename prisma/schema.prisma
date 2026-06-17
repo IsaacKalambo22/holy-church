@@ -191,17 +191,27 @@ model Podcast {
 }
 
 model Ministry {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  imageUrl    String?
-  leader      User?    @relation(fields: [leaderId], references: [id])
-  leaderId    String?
-  deletedAt   DateTime? @db.Timestamptz
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @updatedAt @db.Timestamptz
+  id                String   @id @default(uuid())
+  name              String
+  slug              String   @unique
+  description       String?
+  imageUrl          String?
+  category          String?
+  status            String   @default("ACTIVE")
+  meetingSchedule   String?
+  contactEmail      String?
+  contactPhone      String?
+  volunteerRequired Boolean  @default(false)
+  leader            User?    @relation(fields: [leaderId], references: [id])
+  leaderId          String?
+  deletedAt         DateTime? @db.Timestamptz
+  createdAt         DateTime @default(now()) @db.Timestamptz
+  updatedAt         DateTime @updatedAt @db.Timestamptz
 
   @@index([deletedAt])
+  @@index([slug])
+  @@index([category])
+  @@index([status])
   @@map("ministries")
 }
 
