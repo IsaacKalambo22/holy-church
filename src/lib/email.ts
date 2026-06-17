@@ -1,4 +1,4 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
 export async function sendEmail({
   to,
@@ -9,27 +9,36 @@ export async function sendEmail({
   subject: string
   html: string
 }) {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    console.error('RESEND_API_KEY is not set')
-    return { success: false, error: 'Missing API key' }
+  const smtpHost = process.env.SMTP_HOST
+  const smtpPort = parseInt(process.env.SMTP_PORT || '587')
+  const smtpUser = process.env.SMTP_USER
+  const smtpPass = process.env.SMTP_PASS
+  const fromEmail = process.env.SMTP_FROM || 'noreply@holychurch.mw'
+
+  if (!smtpHost || !smtpUser || !smtpPass) {
+    console.error('SMTP credentials are not set')
+    return { success: false, error: 'Missing SMTP credentials' }
   }
 
   try {
-    const resend = new Resend(apiKey)
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'noreply@holychurch.com',
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    })
+
+    const info = await transporter.sendMail({
+      from: fromEmail,
       to,
       subject,
       html,
     })
 
-    if (error) {
-      console.error('Email error:', error)
-      return { success: false, error }
-    }
-
-    return { success: true, data }
+    return { success: true, data: info }
   } catch (error) {
     console.error('Email error:', error)
     return { success: false, error }
