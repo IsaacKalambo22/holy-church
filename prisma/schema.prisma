@@ -134,11 +134,15 @@ model Donation {
 model Blog {
   id           String   @id @default(uuid())
   title        String
-  content      String?
   slug         String   @unique
+  excerpt      String?
+  content      String?
+  status       String   @default("DRAFT")
+  thumbnailUrl String?
   author       User?    @relation(fields: [authorId], references: [id])
   authorId     String?
-  thumbnailUrl String?
+  categoryId   String?
+  category     BlogCategory? @relation(fields: [categoryId], references: [id])
   published    Boolean  @default(false)
   publishedAt  DateTime? @db.Timestamptz
   deletedAt    DateTime? @db.Timestamptz
@@ -148,8 +152,34 @@ model Blog {
   @@index([published])
   @@index([slug])
   @@index([publishedAt])
+  @@index([status])
+  @@index([categoryId])
   @@index([deletedAt])
   @@map("blogs")
+}
+
+model BlogCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  blogs       Blog[]
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([slug])
+  @@map("blog_categories")
+}
+
+model BlogTag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  @@index([slug])
+  @@map("blog_tags")
 }
 
 model PrayerRequest {

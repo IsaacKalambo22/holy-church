@@ -8,9 +8,25 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
     const limit = Number(query.limit) || 9
     const skip = (page - 1) * limit
     const publishedOnly = query.published !== 'false'
+    const categoryId = query.categoryId as string | undefined
+    const search = query.search as string | undefined
 
-    const where: { deletedAt: Date | null; published?: boolean } = { deletedAt: null }
+    const where: {
+      deletedAt: Date | null
+      published?: boolean
+      categoryId?: string
+      OR?: Array<{ title?: { contains: string; mode: 'insensitive' }; excerpt?: { contains: string; mode: 'insensitive' }; content?: { contains: string; mode: 'insensitive' } }>
+    } = { deletedAt: null }
+    
     if (publishedOnly) where.published = true
+    if (categoryId) where.categoryId = categoryId
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { excerpt: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } },
+      ]
+    }
 
     const [posts, total] = await Promise.all([
       prisma.blog.findMany({
@@ -18,16 +34,39 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
         orderBy: { publishedAt: 'desc' },
         skip,
         take: limit,
-        include: { author: { select: { id: true, name: true, avatar: true } } },
+        include: { 
+          author: { select: { id: true, name: true, avatar: true } },
+          category: { select: { id: true, name: true, slug: true } },
+        },
       }),
       prisma.blog.count({ where }),
     ])
     return { success: true, data: posts, total, page, limit, totalPages: Math.ceil(total / limit) }
   })
+  .get('/categories', async () => {
+    const categories = await prisma.blogCategory.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        _count: {
+          select: { blogs: { where: { published: true, deletedAt: null } } },
+        },
+      },
+    })
+    return { success: true, data: categories }
+  })
+  .get('/tags', async () => {
+    const tags = await prisma.blogTag.findMany({
+      orderBy: { name: 'asc' },
+    })
+    return { success: true, data: tags }
+  })
   .get('/slug/:slug', async ({ params, set }) => {
     const post = await prisma.blog.findUnique({
       where: { slug: params.slug, deletedAt: null },
-      include: { author: { select: { id: true, name: true, avatar: true } } },
+      include: { 
+        author: { select: { id: true, name: true, avatar: true } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     })
     if (!post) {
       set.status = 404
@@ -38,7 +77,10 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
   .get('/:id', async ({ params, set }) => {
     const post = await prisma.blog.findUnique({
       where: { id: params.id, deletedAt: null },
-      include: { author: { select: { id: true, name: true, avatar: true } } },
+      include: { 
+        author: { select: { id: true, name: true, avatar: true } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     })
     if (!post) {
       set.status = 404
@@ -64,9 +106,12 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
       const post = await prisma.blog.create({
         data: {
           title: body.title,
-          content: body.content,
           slug,
+          excerpt: body.excerpt,
+          content: body.content,
+          status: body.status || 'DRAFT',
           authorId: body.authorId,
+          categoryId: body.categoryId,
           thumbnailUrl: body.thumbnailUrl,
           published: body.published ?? false,
           publishedAt: body.published ? new Date() : null,
@@ -77,9 +122,12 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
     {
       body: t.Object({
         title: t.String({ minLength: 3 }),
-        content: t.Optional(t.String()),
         slug: t.Optional(t.String()),
+        excerpt: t.Optional(t.String()),
+        content: t.Optional(t.String()),
+        status: t.Optional(t.String()),
         authorId: t.Optional(t.String()),
+        categoryId: t.Optional(t.String()),
         thumbnailUrl: t.Optional(t.String()),
         published: t.Optional(t.Boolean()),
       }),
@@ -107,9 +155,12 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
         where: { id: params.id },
         data: {
           title: body.title,
-          content: body.content,
           slug,
+          excerpt: body.excerpt,
+          content: body.content,
+          status: body.status,
           authorId: body.authorId,
+          categoryId: body.categoryId,
           thumbnailUrl: body.thumbnailUrl,
           published: body.published,
           publishedAt: body.published && !existing.published ? new Date() : existing.publishedAt,
@@ -120,9 +171,12 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
     {
       body: t.Object({
         title: t.Optional(t.String({ minLength: 3 })),
-        content: t.Optional(t.String()),
         slug: t.Optional(t.String()),
+        excerpt: t.Optional(t.String()),
+        content: t.Optional(t.String()),
+        status: t.Optional(t.String()),
         authorId: t.Optional(t.String()),
+        categoryId: t.Optional(t.String()),
         thumbnailUrl: t.Optional(t.String()),
         published: t.Optional(t.Boolean()),
       }),

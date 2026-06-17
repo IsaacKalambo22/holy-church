@@ -1,0 +1,136 @@
+import type { Metadata } from 'next'
+import { Button } from '@/components/ui/button'
+import { BlogCard } from '@/components/shared/BlogCard'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+
+async function getTag(slug: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/blog/tags`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    return null
+  }
+
+  const result = await response.json()
+  return result.data.find((tag: { slug: string }) => tag.slug === slug) || null
+}
+
+async function getBlogPosts(page: string = '1') {
+  const params = new URLSearchParams()
+  params.set('published', 'true')
+  params.set('page', page)
+  params.set('limit', '9')
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    return { data: [], total: 0, page: 1, totalPages: 1 }
+  }
+
+  return response.json()
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const tag = await getTag(params.slug)
+  
+  if (!tag) {
+    return {
+      title: 'Tag Not Found',
+    }
+  }
+
+  return {
+    title: `${tag.name} — Holy Church Assembly Blog`,
+    description: `Read articles tagged with ${tag.name}.`,
+  }
+}
+
+export default async function TagPage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string }
+  searchParams: Promise<{ page?: string }>
+}) {
+  const tag = await getTag(params.slug)
+  
+  if (!tag) {
+    notFound()
+  }
+
+  const resolvedSearchParams = await searchParams
+  const { data: posts, page, totalPages } = await getBlogPosts(resolvedSearchParams.page)
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="gradient-hero py-20 px-4 text-center">
+        <h1 className="font-heading text-5xl font-bold text-white mb-3">Tag: {tag.name}</h1>
+        <p className="text-white/70 text-xl">Articles tagged with "{tag.name}"</p>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-14">
+        {/* Blog Grid */}
+        {posts.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {posts.map((post: {
+                id: string
+                slug: string
+                title: string
+                excerpt?: string | null
+                thumbnailUrl?: string | null
+                category?: { name: string } | null
+                author?: { name: string } | null
+                publishedAt?: string | null
+              }) => (
+                <Link key={post.id} href={`/blog/${post.slug}`}>
+                  <BlogCard
+                    title={post.title}
+                    excerpt={post.excerpt}
+                    thumbnailUrl={post.thumbnailUrl}
+                    category={post.category?.name}
+                    author={post.author?.name}
+                    date={post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : undefined}
+                    slug={post.slug}
+                  />
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-10">
+                {page > 1 && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/blog/tag/${params.slug}?page=${Number(page) - 1}`}>Previous</Link>
+                  </Button>
+                )}
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/blog/tag/${params.slug}?page=${Number(page) + 1}`}>Next</Link>
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No articles found with this tag.</p>
+            <Button variant="outline" className="mt-4" asChild>
+              <Link href="/blog">Browse All Articles</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Search } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { BlogCard } from '@/components/shared/BlogCard'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Blog — Holy Church Assembly',
@@ -14,18 +17,57 @@ export const metadata: Metadata = {
   },
 }
 
-const posts = [
-  { slug: '1', title: 'Finding Peace in Uncertain Times', category: 'Faith', date: 'Jun 15, 2026', excerpt: 'Discover how Scripture guides us through life\'s most challenging seasons and how peace that surpasses understanding becomes real.', author: 'Pastor John Banda', gradient: 'from-purple-500 to-indigo-600' },
-  { slug: '2', title: 'Why Community is Essential to Faith', category: 'Church Life', date: 'Jun 10, 2026', excerpt: 'We were never designed to do life alone. Here is why gathering together with other believers is not optional but essential.', author: 'Elder Grace Phiri', gradient: 'from-indigo-500 to-purple-600' },
-  { slug: '3', title: 'A Devotional on Psalm 23', category: 'Devotional', date: 'Jun 5, 2026', excerpt: 'An in-depth look at one of the most beloved passages in Scripture and what it means to say "The Lord is my Shepherd."', author: 'Deacon Isaac Mwale', gradient: 'from-violet-500 to-purple-700' },
-  { slug: '4', title: 'Mission Trip Recap: Serving Rural Malawi', category: 'Missions', date: 'May 28, 2026', excerpt: 'Our team shares stories, photos, and lessons from their recent outreach trip to Kasungu and Mchinji.', author: 'Missions Team', gradient: 'from-orange-400 to-rose-500' },
-  { slug: '5', title: 'Youth Ministry: Building the Next Generation', category: 'Youth', date: 'May 22, 2026', excerpt: 'Exciting updates from our rapidly growing youth program and the vision we carry for the next generation of believers.', author: 'Youth Pastor', gradient: 'from-blue-500 to-indigo-600' },
-  { slug: '6', title: 'How to Develop a Consistent Prayer Life', category: 'Prayer', date: 'May 18, 2026', excerpt: 'Practical, biblical strategies to help you build a prayer habit that sustains your faith and transforms your relationship with God.', author: 'Pastor John Banda', gradient: 'from-rose-400 to-orange-500' },
-]
+async function getBlogPosts(searchParams: {
+  search?: string
+  categoryId?: string
+  page?: string
+}) {
+  const params = new URLSearchParams()
+  params.set('published', 'true')
+  if (searchParams.search) params.set('search', searchParams.search)
+  if (searchParams.categoryId) params.set('categoryId', searchParams.categoryId)
+  params.set('page', searchParams.page || '1')
+  params.set('limit', '9')
 
-const catColors: Record<string, 'default' | 'secondary' | 'outline'> = { Faith: 'default', 'Church Life': 'secondary', Devotional: 'outline', Missions: 'default', Youth: 'secondary', Prayer: 'outline' }
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
+    cache: 'no-store',
+  })
 
-export default function BlogPage() {
+  if (!response.ok) {
+    return { data: [], total: 0, page: 1, totalPages: 1 }
+  }
+
+  return response.json()
+}
+
+async function getCategories() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/blog/categories`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    return []
+  }
+
+  const result = await response.json()
+  return result.data
+}
+
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    search?: string
+    categoryId?: string
+    page?: string
+  }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const { data: posts, page, totalPages } = await getBlogPosts(resolvedSearchParams)
+  const categories = await getCategories()
+
   return (
     <div className="min-h-screen bg-background">
       <div className="gradient-hero py-20 px-4 text-center">
@@ -34,26 +76,105 @@ export default function BlogPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
-            <Link key={post.slug} href={`/blog/${post.slug}`}>
-              <Card className="h-full hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group">
-                <div className={`h-44 rounded-t-xl bg-gradient-to-br ${post.gradient}`} />
-                <CardHeader className="pt-5 pb-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant={catColors[post.category] || 'outline'}>{post.category}</Badge>
-                    <span className="text-xs text-muted-foreground">{post.date}</span>
-                  </div>
-                  <CardTitle className="text-base leading-snug group-hover:text-primary transition-colors">{post.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">{post.excerpt}</p>
-                  <p className="text-xs text-muted-foreground">By {post.author}</p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        {/* Search and Filters */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-10">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              className="pl-9" 
+              placeholder="Search articles..." 
+              defaultValue={resolvedSearchParams.search}
+              name="search"
+            />
+          </div>
+          <div className="flex gap-3">
+            <select 
+              className="h-10 px-3 border border-input rounded-lg bg-background text-sm"
+              name="categoryId"
+              defaultValue={resolvedSearchParams.categoryId}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat: { id: string; name: string; slug: string }) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
+
+        {/* Active Filters */}
+        {(resolvedSearchParams.search || resolvedSearchParams.categoryId) && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {resolvedSearchParams.search && (
+              <Badge variant="secondary" className="gap-1">
+                Search: {resolvedSearchParams.search}
+              </Badge>
+            )}
+            {resolvedSearchParams.categoryId && (
+              <Badge variant="secondary" className="gap-1">
+                Category: {categories.find((c: { id: string }) => c.id === resolvedSearchParams.categoryId)?.name}
+              </Badge>
+            )}
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/blog">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
+
+        {/* Blog Grid */}
+        {posts.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {posts.map((post: {
+                id: string
+                slug: string
+                title: string
+                excerpt?: string | null
+                thumbnailUrl?: string | null
+                category?: { name: string } | null
+                author?: { name: string } | null
+                publishedAt?: string | null
+              }) => (
+                <Link key={post.id} href={`/blog/${post.slug}`}>
+                  <BlogCard
+                    title={post.title}
+                    excerpt={post.excerpt}
+                    thumbnailUrl={post.thumbnailUrl}
+                    category={post.category?.name}
+                    author={post.author?.name}
+                    date={post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : undefined}
+                    slug={post.slug}
+                  />
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-10">
+                {page > 1 && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/blog?page=${Number(page) - 1}`}>Previous</Link>
+                  </Button>
+                )}
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/blog?page=${Number(page) + 1}`}>Next</Link>
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No articles found matching your criteria.</p>
+            <Button variant="outline" className="mt-4" asChild>
+              <Link href="/blog">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
