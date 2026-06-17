@@ -6,7 +6,16 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 
-export const metadata: Metadata = { title: 'Contact' }
+export const metadata: Metadata = {
+  title: 'Contact Us — Holy Church Assembly',
+  description: 'Get in touch with Holy Church Assembly. We would love to hear from you. Visit us in Lilongwe or send us a message.',
+  keywords: ['contact', 'phone', 'email', 'address', 'map', 'Lilongwe'],
+  openGraph: {
+    title: 'Contact Us — Holy Church Assembly',
+    description: 'We would love to hear from you.',
+    type: 'website',
+  },
+}
 
 const info = [
   { icon: MapPin, label: 'Address', value: '123 Faith Avenue, Area 3, Lilongwe, Malawi' },

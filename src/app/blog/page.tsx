@@ -3,7 +3,16 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
-export const metadata: Metadata = { title: 'Blog' }
+export const metadata: Metadata = {
+  title: 'Blog — Holy Church Assembly',
+  description: 'Read articles, devotionals, and stories from Holy Church Assembly. Biblical teaching, church life updates, and spiritual encouragement.',
+  keywords: ['blog', 'articles', 'devotionals', 'stories', 'teaching', 'faith'],
+  openGraph: {
+    title: 'Blog — Holy Church Assembly',
+    description: 'Articles, devotionals, and stories from our community.',
+    type: 'website',
+  },
+}
 
 const posts = [
   { slug: '1', title: 'Finding Peace in Uncertain Times', category: 'Faith', date: 'Jun 15, 2026', excerpt: 'Discover how Scripture guides us through life\'s most challenging seasons and how peace that surpasses understanding becomes real.', author: 'Pastor John Banda', gradient: 'from-purple-500 to-indigo-600' },

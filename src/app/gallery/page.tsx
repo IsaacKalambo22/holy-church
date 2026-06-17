@@ -1,6 +1,15 @@
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Gallery' }
+export const metadata: Metadata = {
+  title: 'Gallery — Holy Church Assembly',
+  description: 'View photos and videos from Holy Church Assembly events, services, and community life in Lilongwe, Malawi.',
+  keywords: ['gallery', 'photos', 'videos', 'events', 'services', 'community'],
+  openGraph: {
+    title: 'Gallery — Holy Church Assembly',
+    description: 'Moments captured from our life together.',
+    type: 'website',
+  },
+}
 
 const items = [
   { label: 'Sunday Worship', gradient: 'from-purple-500 to-indigo-600' },

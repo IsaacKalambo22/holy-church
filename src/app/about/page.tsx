@@ -4,7 +4,16 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'About Us' }
+export const metadata: Metadata = {
+  title: 'About Us — Holy Church Assembly',
+  description: 'Learn about Holy Church Assembly\'s story, mission, vision, and core values. A community of believers in Lilongwe, Malawi, passionate about worship and service.',
+  keywords: ['about', 'church history', 'mission', 'vision', 'values', 'Malawi'],
+  openGraph: {
+    title: 'About Us — Holy Church Assembly',
+    description: 'Our story, our values, and our mission.',
+    type: 'website',
+  },
+}
 
 const values = [
   { icon: BookOpen, title: 'Scripture-Centred', desc: 'Every decision, every sermon, every ministry is anchored in the authority and truth of God\'s Word.' },

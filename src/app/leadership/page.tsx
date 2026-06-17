@@ -3,7 +3,16 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'Leadership' }
+export const metadata: Metadata = {
+  title: 'Leadership — Holy Church Assembly',
+  description: 'Meet the leadership team at Holy Church Assembly. Our pastors and leaders are committed to serving with humility, integrity, and love.',
+  keywords: ['leadership', 'pastors', 'team', 'church leaders', 'Malawi'],
+  openGraph: {
+    title: 'Leadership — Holy Church Assembly',
+    description: 'Meet the team serving our church.',
+    type: 'website',
+  },
+}
 
 const leadership = [
   {

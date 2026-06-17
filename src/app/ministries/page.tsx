@@ -4,7 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'Ministries' }
+export const metadata: Metadata = {
+  title: 'Ministries — Holy Church Assembly',
+  description: 'Discover the various ministries at Holy Church Assembly. From worship to outreach, find your place to serve and grow.',
+  keywords: ['ministries', 'worship', 'youth', 'children', 'outreach', 'missions', 'serve'],
+  openGraph: {
+    title: 'Ministries — Holy Church Assembly',
+    description: 'Find your place. Use your gifts. Make a difference.',
+    type: 'website',
+  },
+}
 
 const ministries = [
   { icon: Music, name: 'Worship Ministry', desc: 'Leading the congregation into the presence of God through anointed music, song, and creative expression. We rehearse weekly and serve every Sunday.', lead: 'Worship Director', color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30' },

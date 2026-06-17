@@ -5,7 +5,16 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
-export const metadata: Metadata = { title: 'Give Online' }
+export const metadata: Metadata = {
+  title: 'Give Online — Holy Church Assembly',
+  description: 'Support the mission of Holy Church Assembly through secure online giving. Your generosity fuels our work in Malawi.',
+  keywords: ['give', 'donate', 'offering', 'tithe', 'generosity', 'support'],
+  openGraph: {
+    title: 'Give Online — Holy Church Assembly',
+    description: 'Your generosity fuels the mission. Every gift matters.',
+    type: 'website',
+  },
+}
 
 const amounts = [500, 1000, 2500, 5000, 10000, 25000]
 const funds = ['General Fund', 'Missions Fund', 'Building Fund', 'Youth Ministry', 'Community Outreach', "Children's Ministry"]
