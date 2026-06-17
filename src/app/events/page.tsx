@@ -1,29 +1,68 @@
 import type { Metadata } from 'next'
-import { Calendar, MapPin, Clock } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { EventCard } from '@/components/shared/EventCard'
+import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'Events' }
-
-const events = [
-  { title: 'Annual Church Convention', date: 'Jul 4–6, 2026', time: '9:00 AM', location: 'Main Sanctuary', category: 'Convention', desc: 'Three days of powerful worship, teaching, and fellowship. This year\'s theme: "Rooted and Built Up in Him."' },
-  { title: 'Youth Worship Night', date: 'Jun 27, 2026', time: '7:00 PM', location: 'Youth Center', category: 'Youth', desc: 'An electric night of worship, spoken word, and community designed for the next generation.' },
-  { title: 'Community Outreach Day', date: 'Jun 22, 2026', time: '8:00 AM', location: 'Area 18, Lilongwe', category: 'Outreach', desc: 'Join us as we serve our city. Free food, medical checkups, and practical community care.' },
-  { title: 'Marriage Enrichment Seminar', date: 'Jul 12, 2026', time: '10:00 AM', location: 'Fellowship Hall', category: 'Family', desc: 'A practical one-day seminar for couples at every stage of marriage. Registration required.' },
-  { title: 'Prayer & Fasting Week', date: 'Jul 20–27, 2026', time: '6:00 AM', location: 'Prayer Room', category: 'Prayer', desc: 'Seven days of corporate prayer and fasting. Join us each morning as we seek the face of God.' },
-  { title: "Children's Day Celebration", date: 'Aug 2, 2026', time: '9:00 AM', location: 'Main Sanctuary', category: 'Children', desc: 'A special day celebrating the children in our community with fun, games, gifts, and a kid-focused service.' },
-]
-
-const catColors: Record<string, string> = {
-  Convention: 'bg-purple-100 text-purple-700',
-  Youth: 'bg-blue-100 text-blue-700',
-  Outreach: 'bg-orange-100 text-orange-700',
-  Family: 'bg-rose-100 text-rose-700',
-  Prayer: 'bg-indigo-100 text-indigo-700',
-  Children: 'bg-yellow-100 text-yellow-700',
+export const metadata: Metadata = {
+  title: 'Events — Holy Church Assembly',
+  description: 'Stay connected with what God is doing in our community. Join us for worship, conferences, youth events, and outreach programs.',
+  keywords: ['events', 'conferences', 'worship', 'youth', 'outreach', 'community'],
+  openGraph: {
+    title: 'Events — Holy Church Assembly',
+    description: 'Stay connected with what God is doing in our community.',
+    type: 'website',
+  },
 }
 
-export default function EventsPage() {
+async function getEvents(searchParams: {
+  search?: string
+  category?: string
+  location?: string
+  status?: string
+  sort?: string
+  page?: string
+}) {
+  const params = new URLSearchParams()
+  if (searchParams.search) params.set('search', searchParams.search)
+  if (searchParams.category) params.set('category', searchParams.category)
+  if (searchParams.location) params.set('location', searchParams.location)
+  if (searchParams.status) params.set('status', searchParams.status)
+  if (searchParams.sort) params.set('sort', searchParams.sort)
+  params.set('page', searchParams.page || '1')
+  params.set('limit', '10')
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/events?${params.toString()}`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    return { data: [], total: 0, page: 1, totalPages: 1 }
+  }
+
+  return response.json()
+}
+
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    search?: string
+    category?: string
+    location?: string
+    status?: string
+    sort?: string
+    page?: string
+  }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const { data: events, page, totalPages } = await getEvents(resolvedSearchParams)
+
+  const categories = ['Convention', 'Youth', 'Outreach', 'Family', 'Prayer', 'Children', 'Worship', 'Missions', 'Community']
+
   return (
     <div className="min-h-screen bg-background">
       <div className="gradient-hero py-20 px-4">
@@ -34,29 +73,113 @@ export default function EventsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {events.map((event) => (
-            <Card key={event.title} className="hover:shadow-md hover:-translate-y-0.5 transition-all">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-3">
-                  <CardTitle className="text-lg leading-snug">{event.title}</CardTitle>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${catColors[event.category]}`}>
-                    {event.category}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-muted-foreground text-sm leading-relaxed">{event.desc}</p>
-                <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted-foreground pt-1">
-                  <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-primary" />{event.date}</span>
-                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" />{event.time}</span>
-                  <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-primary" />{event.location}</span>
-                </div>
-                <Button size="sm" variant="outline" className="mt-1">Learn More</Button>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Search and Filters */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-10">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              className="pl-9" 
+              placeholder="Search events, categories, or locations..." 
+              defaultValue={resolvedSearchParams.search}
+              name="search"
+            />
+          </div>
+          <div className="flex gap-3">
+            <select 
+              className="h-10 px-3 border border-input rounded-lg bg-background text-sm"
+              name="category"
+              defaultValue={resolvedSearchParams.category}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            <select 
+              className="h-10 px-3 border border-input rounded-lg bg-background text-sm"
+              name="sort"
+              defaultValue={resolvedSearchParams.sort || 'upcoming'}
+            >
+              <option value="upcoming">Upcoming First</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </div>
         </div>
+
+        {/* Active Filters */}
+        {(resolvedSearchParams.search || resolvedSearchParams.category || resolvedSearchParams.location || resolvedSearchParams.status) && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {resolvedSearchParams.search && (
+              <Badge variant="secondary" className="gap-1">
+                Search: {resolvedSearchParams.search}
+              </Badge>
+            )}
+            {resolvedSearchParams.category && (
+              <Badge variant="secondary" className="gap-1">
+                Category: {resolvedSearchParams.category}
+              </Badge>
+            )}
+            {resolvedSearchParams.location && (
+              <Badge variant="secondary" className="gap-1">
+                Location: {resolvedSearchParams.location}
+              </Badge>
+            )}
+            {resolvedSearchParams.status && (
+              <Badge variant="secondary" className="gap-1">
+                Status: {resolvedSearchParams.status}
+              </Badge>
+            )}
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/events">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
+
+        {/* Events Grid */}
+        {events.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {events.map((event: { id: string; slug: string; title: string; date: string; endDate?: string | null; location?: string | null; category?: string | null; description?: string | null; excerpt?: string | null }) => (
+                <Link key={event.id} href={`/events/${event.slug}`}>
+                  <EventCard
+                    title={event.title}
+                    date={new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    location={event.location || undefined}
+                    category={event.category || undefined}
+                    description={event.excerpt || event.description || undefined}
+                  />
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-10">
+                {page > 1 && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/events?page=${Number(page) - 1}`}>Previous</Link>
+                  </Button>
+                )}
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/events?page=${Number(page) + 1}`}>Next</Link>
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No events found matching your criteria.</p>
+            <Button variant="outline" className="mt-4" asChild>
+              <Link href="/events">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

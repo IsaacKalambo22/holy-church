@@ -75,20 +75,29 @@ model Sermon {
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  date        DateTime @db.Timestamptz
-  endDate     DateTime? @db.Timestamptz
-  location    String?
-  imageUrl    String?
-  category    String?
-  deletedAt   DateTime? @db.Timestamptz
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  updatedAt   DateTime @updatedAt @db.Timestamptz
+  id                      String   @id @default(uuid())
+  title                   String
+  slug                    String   @unique
+  description             String?
+  excerpt                 String?
+  date                    DateTime @db.Timestamptz
+  endDate                 DateTime? @db.Timestamptz
+  location                String?
+  venue                   String?
+  imageUrl                String?
+  category                String?
+  capacity                Int?
+  status                  String   @default("DRAFT")
+  registrationRequired    Boolean  @default(false)
+  registrationDeadline    DateTime? @db.Timestamptz
+  deletedAt               DateTime? @db.Timestamptz
+  createdAt               DateTime @default(now()) @db.Timestamptz
+  updatedAt               DateTime @updatedAt @db.Timestamptz
 
   @@index([date])
   @@index([category])
+  @@index([slug])
+  @@index([status])
   @@index([deletedAt])
   @@map("events")
 }
