@@ -15,6 +15,7 @@ import { contactRoutes } from './routes/contact'
 import { memberRoutes } from './routes/member'
 import { adminRoutes } from './routes/admin'
 import { notificationRoutes } from './routes/notifications'
+import { searchRoutes } from './routes/search'
 
 export const app = new Elysia({ prefix: '/api' })
   .use(errorHandler)
@@ -45,3 +46,4 @@ export const app = new Elysia({ prefix: '/api' })
   .use(memberRoutes)
   .use(adminRoutes)
   .use(notificationRoutes)
+  .use(searchRoutes)

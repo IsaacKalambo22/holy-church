@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { GlobalSearch } from '@/components/shared/GlobalSearch'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -106,6 +107,7 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-2">
+            <GlobalSearch />
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
