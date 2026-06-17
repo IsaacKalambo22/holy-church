@@ -1,10 +1,8 @@
 import type { Metadata } from 'next'
 import { Heart, BookOpen, Users, Clock } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
+import { PrayerRequestForm } from '@/components/shared/PrayerRequestForm'
 import { FAQSection } from '@/components/shared/FAQSection'
 
 export const metadata: Metadata = {
@@ -50,25 +48,7 @@ export default function PrayerPage() {
               <p className="text-muted-foreground text-lg leading-relaxed mb-8">
                 Whether you are facing a challenge, celebrating a victory, or simply need someone to agree with you in prayer — we are here for you.
               </p>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Prayer Request Form</CardTitle>
-                  <CardDescription>Our team will pray for you within 24 hours</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5"><Label>Name</Label><Input placeholder="Your name" /></div>
-                    <div className="space-y-1.5"><Label>Email</Label><Input type="email" placeholder="you@email.com" /></div>
-                  </div>
-                  <div className="space-y-1.5"><Label>Subject</Label><Input placeholder="Brief subject line" /></div>
-                  <div className="space-y-1.5"><Label>Prayer Request</Label><Textarea rows={5} placeholder="How can we pray for you?" /></div>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="anonymous" className="w-4 h-4" />
-                    <Label htmlFor="anonymous" className="text-sm">Keep this request anonymous</Label>
-                  </div>
-                  <Button variant="brand" size="lg" className="w-full">Submit Prayer Request</Button>
-                </CardContent>
-              </Card>
+              <PrayerRequestForm />
             </div>
 
             <div className="space-y-6">

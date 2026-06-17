@@ -1,11 +1,17 @@
 import type { Metadata } from 'next'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
+import { PrayerRequestForm } from '@/components/shared/PrayerRequestForm'
 
-export const metadata: Metadata = { title: 'Prayer Requests' }
+export const metadata: Metadata = {
+  title: 'Prayer Requests — Holy Church Assembly',
+  description: 'Submit a prayer request at Holy Church Assembly. We believe prayer changes things.',
+  keywords: ['prayer', 'prayer request', 'intercession', 'spiritual support'],
+  openGraph: {
+    title: 'Prayer Requests — Holy Church Assembly',
+    description: 'We believe prayer changes things. Share your heart.',
+    type: 'website',
+  },
+}
 
 export default function PrayerRequestsPage() {
   return (
@@ -21,38 +27,7 @@ export default function PrayerRequestsPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-14">
-        <Card>
-          <CardHeader>
-            <CardTitle>Submit Your Prayer Request</CardTitle>
-            <CardDescription>
-              Your request will be kept confidential unless you choose to share it publicly. Our prayer team prays daily.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5"><Label>First Name</Label><Input placeholder="Grace" /></div>
-              <div className="space-y-1.5"><Label>Last Name</Label><Input placeholder="Phiri" /></div>
-            </div>
-            <div className="space-y-1.5"><Label>Email (optional)</Label><Input type="email" placeholder="you@email.com" /></div>
-            <div className="space-y-1.5">
-              <Label>Your Prayer Request</Label>
-              <Textarea rows={6} placeholder="Share what is on your heart. Be as detailed as you would like..." />
-            </div>
-            <div className="flex items-start gap-3">
-              <input type="checkbox" id="anon" className="mt-0.5 w-4 h-4 rounded border-border accent-primary" />
-              <label htmlFor="anon" className="text-sm text-muted-foreground leading-snug">
-                Keep my request anonymous — only the prayer team will see my name
-              </label>
-            </div>
-            <div className="flex items-start gap-3">
-              <input type="checkbox" id="share" className="mt-0.5 w-4 h-4 rounded border-border accent-primary" />
-              <label htmlFor="share" className="text-sm text-muted-foreground leading-snug">
-                Allow this request to be shared with the congregation (name hidden)
-              </label>
-            </div>
-            <Button variant="brand" size="lg" className="w-full">Submit Prayer Request</Button>
-          </CardContent>
-        </Card>
+        <PrayerRequestForm />
 
         <div className="mt-8 p-6 rounded-2xl bg-primary/5 border border-primary/20 text-center">
           <p className="text-sm font-semibold text-foreground mb-2">Need to speak to someone urgently?</p>

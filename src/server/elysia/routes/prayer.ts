@@ -8,11 +8,23 @@ export const prayerRoutes = new Elysia({ prefix: '/prayer' })
     const limit = Number(query.limit) || 20
     const skip = (page - 1) * limit
     const status = query.status as string | undefined
+    const category = query.category as string | undefined
     const publicOnly = query.public !== 'false'
+    const userId = query.userId as string | undefined
 
-    const where: { deletedAt: Date | null; isAnonymous?: boolean; status?: string } = { deletedAt: null }
-    if (publicOnly) where.isAnonymous = false
+    const where: {
+      deletedAt: Date | null
+      isAnonymous?: boolean
+      isPublic?: boolean
+      status?: string
+      category?: string
+      userId?: string
+    } = { deletedAt: null }
+    
+    if (publicOnly) where.isPublic = true
     if (status) where.status = status
+    if (category) where.category = category
+    if (userId) where.userId = userId
 
     const [requests, total] = await Promise.all([
       prisma.prayerRequest.findMany({
@@ -42,8 +54,11 @@ export const prayerRoutes = new Elysia({ prefix: '/prayer' })
     async ({ body }) => {
       const request = await prisma.prayerRequest.create({
         data: {
+          title: body.title,
           request: body.request,
+          category: body.category,
           isAnonymous: body.isAnonymous ?? false,
+          isPublic: body.isPublic ?? false,
           userId: body.userId,
           status: 'PENDING',
         },
@@ -52,8 +67,11 @@ export const prayerRoutes = new Elysia({ prefix: '/prayer' })
     },
     {
       body: t.Object({
+        title: t.Optional(t.String()),
         request: t.String({ minLength: 10 }),
+        category: t.Optional(t.String()),
         isAnonymous: t.Optional(t.Boolean()),
+        isPublic: t.Optional(t.Boolean()),
         userId: t.Optional(t.String()),
       }),
     }
@@ -74,8 +92,11 @@ export const prayerRoutes = new Elysia({ prefix: '/prayer' })
       const request = await prisma.prayerRequest.update({
         where: { id: params.id },
         data: {
+          title: body.title,
           request: body.request,
+          category: body.category,
           isAnonymous: body.isAnonymous,
+          isPublic: body.isPublic,
           status: body.status,
         },
       })
@@ -83,9 +104,12 @@ export const prayerRoutes = new Elysia({ prefix: '/prayer' })
     },
     {
       body: t.Object({
+        title: t.Optional(t.String()),
         request: t.Optional(t.String({ minLength: 10 })),
+        category: t.Optional(t.String()),
         isAnonymous: t.Optional(t.Boolean()),
-        status: t.Optional(t.Union([t.Literal('PENDING'), t.Literal('PRAYED'), t.Literal('ARCHIVED')])),
+        isPublic: t.Optional(t.Boolean()),
+        status: t.Optional(t.Union([t.Literal('PENDING'), t.Literal('PRAYED'), t.Literal('ANSWERED'), t.Literal('ARCHIVED')])),
       }),
     }
   )
