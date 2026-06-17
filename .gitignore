@@ -1,6 +1,7 @@
 # Dependencies
 node_modules
 dist
+.next
 
 # Prisma
 src/prisma/generated/
@@ -35,3 +36,4 @@ Thumbs.db
 # Build
 dist/
 build/
+.next
