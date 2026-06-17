@@ -9,15 +9,45 @@ export const sermonRoutes = new Elysia({ prefix: '/sermons' })
     const skip = (page - 1) * limit
     const publishedOnly = query.published !== 'false'
     const series = query.series as string | undefined
+    const speaker = query.speaker as string | undefined
+    const year = query.year as string | undefined
+    const search = query.search as string | undefined
+    const sort = (query.sort as string) || 'newest'
 
-    const where: { deletedAt: Date | null; published?: boolean; series?: string } = { deletedAt: null }
+    const where: {
+      deletedAt: Date | null
+      published?: boolean
+      series?: string
+      preacher?: { name: { contains: string; mode: 'insensitive' } }
+      date?: { gte: Date; lte: Date }
+      OR?: Array<{ title?: { contains: string; mode: 'insensitive' }; description?: { contains: string; mode: 'insensitive' }; series?: { contains: string; mode: 'insensitive' } }>
+    } = { deletedAt: null }
+    
     if (publishedOnly) where.published = true
     if (series) where.series = series
+    if (speaker) where.preacher = { name: { contains: speaker, mode: 'insensitive' } }
+    if (year) {
+      const startDate = new Date(`${year}-01-01`)
+      const endDate = new Date(`${year}-12-31`)
+      where.date = { gte: startDate, lte: endDate }
+    }
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { series: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+
+    const orderBy: { date?: 'desc' | 'asc'; views?: 'desc' } = {}
+    if (sort === 'oldest') orderBy.date = 'asc'
+    else if (sort === 'views') orderBy.views = 'desc'
+    else orderBy.date = 'desc'
 
     const [sermons, total] = await Promise.all([
       prisma.sermon.findMany({
         where,
-        orderBy: { date: 'desc' },
+        orderBy,
         skip,
         take: limit,
         include: { preacher: { select: { id: true, name: true, avatar: true } } },
@@ -25,6 +55,17 @@ export const sermonRoutes = new Elysia({ prefix: '/sermons' })
       prisma.sermon.count({ where }),
     ])
     return { success: true, data: sermons, total, page, limit, totalPages: Math.ceil(total / limit) }
+  })
+  .get('/slug/:slug', async ({ params, set }) => {
+    const sermon = await prisma.sermon.findUnique({
+      where: { slug: params.slug, deletedAt: null },
+      include: { preacher: { select: { id: true, name: true, avatar: true } } },
+    })
+    if (!sermon) {
+      set.status = 404
+      return { success: false, error: 'Sermon not found' }
+    }
+    return { success: true, data: sermon }
   })
   .get('/:id', async ({ params, set }) => {
     const sermon = await prisma.sermon.findUnique({
@@ -45,6 +86,7 @@ export const sermonRoutes = new Elysia({ prefix: '/sermons' })
       const sermon = await prisma.sermon.create({
         data: {
           title: body.title,
+          slug: body.slug,
           description: body.description,
           videoUrl: body.videoUrl,
           audioUrl: body.audioUrl,
@@ -60,6 +102,7 @@ export const sermonRoutes = new Elysia({ prefix: '/sermons' })
     {
       body: t.Object({
         title: t.String({ minLength: 3 }),
+        slug: t.String({ minLength: 3 }),
         description: t.Optional(t.String()),
         videoUrl: t.Optional(t.String()),
         audioUrl: t.Optional(t.String()),
@@ -86,6 +129,7 @@ export const sermonRoutes = new Elysia({ prefix: '/sermons' })
         where: { id: params.id },
         data: {
           title: body.title,
+          slug: body.slug,
           description: body.description,
           videoUrl: body.videoUrl,
           audioUrl: body.audioUrl,
@@ -101,6 +145,7 @@ export const sermonRoutes = new Elysia({ prefix: '/sermons' })
     {
       body: t.Object({
         title: t.Optional(t.String({ minLength: 3 })),
+        slug: t.Optional(t.String({ minLength: 3 })),
         description: t.Optional(t.String()),
         videoUrl: t.Optional(t.String()),
         audioUrl: t.Optional(t.String()),

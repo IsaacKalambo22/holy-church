@@ -51,6 +51,7 @@ model User {
 model Sermon {
   id           String   @id @default(uuid())
   title        String
+  slug         String   @unique
   description  String?
   date         DateTime @default(now()) @db.Timestamptz
   videoUrl     String?
@@ -68,6 +69,7 @@ model Sermon {
   @@index([published])
   @@index([date])
   @@index([series])
+  @@index([slug])
   @@index([deletedAt])
   @@map("sermons")
 }

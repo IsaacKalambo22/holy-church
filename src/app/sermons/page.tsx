@@ -1,22 +1,66 @@
 import type { Metadata } from 'next'
-import { Play, Search, Clock, Filter } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { SermonCard } from '@/components/shared/SermonCard'
+import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'Sermons' }
+export const metadata: Metadata = {
+  title: 'Sermons — Holy Church Assembly',
+  description: 'Watch and listen to sermons from Holy Church Assembly. Biblical teaching, spiritual growth, and practical wisdom for daily life.',
+  keywords: ['sermons', 'teaching', 'preaching', 'messages', 'Bible study'],
+  openGraph: {
+    title: 'Sermons — Holy Church Assembly',
+    description: 'Watch, listen, and grow in your walk with God.',
+    type: 'website',
+  },
+}
 
-const sermons = Array.from({ length: 9 }, (_, i) => ({
-  id: `sermon-${i + 1}`,
-  title: ['Walking in the Spirit', 'The Grace of God', 'Faith Over Fear', 'Renewed Mind', 'His Presence', 'Love One Another', 'The Great Commission', 'Living in Victory', 'Purpose Driven Life'][i],
-  preacher: i % 2 === 0 ? 'Pastor John Banda' : 'Elder Grace Phiri',
-  series: ['Faith Series', 'Grace Series', 'Life Series', 'Mind Renewal'][i % 4],
-  duration: `${38 + i * 3} min`,
-  date: `Jun ${i + 1}, 2026`,
-}))
+async function getSermons(searchParams: {
+  search?: string
+  series?: string
+  speaker?: string
+  year?: string
+  sort?: string
+  page?: string
+}) {
+  const params = new URLSearchParams()
+  if (searchParams.search) params.set('search', searchParams.search)
+  if (searchParams.series) params.set('series', searchParams.series)
+  if (searchParams.speaker) params.set('speaker', searchParams.speaker)
+  if (searchParams.year) params.set('year', searchParams.year)
+  if (searchParams.sort) params.set('sort', searchParams.sort)
+  params.set('page', searchParams.page || '1')
+  params.set('limit', '12')
 
-export default function SermonsPage() {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const response = await fetch(`${baseUrl}/api/sermons?${params.toString()}`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    return { data: [], total: 0, page: 1, totalPages: 1 }
+  }
+
+  return response.json()
+}
+
+export default async function SermonsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    search?: string
+    series?: string
+    speaker?: string
+    year?: string
+    sort?: string
+    page?: string
+  }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const { data: sermons, page, totalPages } = await getSermons(resolvedSearchParams)
+
   return (
     <div className="min-h-screen bg-background">
       <div className="gradient-hero py-20 px-4">
@@ -27,38 +71,113 @@ export default function SermonsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-14">
-        <div className="flex flex-col sm:flex-row gap-3 mb-10">
+        {/* Search and Filters */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-10">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search sermons, series, or preachers..." />
+            <Input 
+              className="pl-9" 
+              placeholder="Search sermons, series, or preachers..." 
+              defaultValue={resolvedSearchParams.search}
+              name="search"
+            />
           </div>
-          <Button variant="outline">
-            <Filter className="w-4 h-4 mr-2" /> Filter
-          </Button>
+          <div className="flex gap-3">
+            <select 
+              className="h-10 px-3 border border-input rounded-lg bg-background text-sm"
+              name="series"
+              defaultValue={resolvedSearchParams.series}
+            >
+              <option value="">All Series</option>
+              <option value="Faith Series">Faith Series</option>
+              <option value="Grace Series">Grace Series</option>
+              <option value="Life Series">Life Series</option>
+            </select>
+            <select 
+              className="h-10 px-3 border border-input rounded-lg bg-background text-sm"
+              name="sort"
+              defaultValue={resolvedSearchParams.sort || 'newest'}
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="views">Most Viewed</option>
+            </select>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sermons.map((sermon) => (
-            <Card key={sermon.id} className="group overflow-hidden cursor-pointer">
-              <div className="relative h-48 gradient-hero flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Play className="w-7 h-7 text-white ml-1" />
-                </div>
-                <div className="absolute bottom-3 left-3">
-                  <Badge className="bg-[var(--brand-orange)] border-0 text-white text-xs">{sermon.series}</Badge>
-                </div>
+        {/* Active Filters */}
+        {(resolvedSearchParams.search || resolvedSearchParams.series || resolvedSearchParams.speaker || resolvedSearchParams.year) && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {resolvedSearchParams.search && (
+              <Badge variant="secondary" className="gap-1">
+                Search: {resolvedSearchParams.search}
+              </Badge>
+            )}
+            {resolvedSearchParams.series && (
+              <Badge variant="secondary" className="gap-1">
+                Series: {resolvedSearchParams.series}
+              </Badge>
+            )}
+            {resolvedSearchParams.speaker && (
+              <Badge variant="secondary" className="gap-1">
+                Speaker: {resolvedSearchParams.speaker}
+              </Badge>
+            )}
+            {resolvedSearchParams.year && (
+              <Badge variant="secondary" className="gap-1">
+                Year: {resolvedSearchParams.year}
+              </Badge>
+            )}
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/sermons">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
+
+        {/* Sermons Grid */}
+        {sermons.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sermons.map((sermon: { id: string; slug: string; title: string; preacher?: { name: string } | null; series?: string | null; date: string; thumbnailUrl?: string | null }) => (
+                <Link key={sermon.id} href={`/sermons/${sermon.slug}`}>
+                  <SermonCard
+                    title={sermon.title}
+                    preacher={sermon.preacher?.name || 'Unknown'}
+                    series={sermon.series || undefined}
+                    date={new Date(sermon.date).toLocaleDateString()}
+                    thumbnailUrl={sermon.thumbnailUrl}
+                  />
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-10">
+                {page > 1 && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/sermons?page=${Number(page) - 1}`}>Previous</Link>
+                  </Button>
+                )}
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Button variant="outline" asChild>
+                    <Link href={`/sermons?page=${Number(page) + 1}`}>Next</Link>
+                  </Button>
+                )}
               </div>
-              <CardContent className="pt-5">
-                <h3 className="font-heading font-semibold text-foreground text-lg group-hover:text-primary transition-colors mb-1">{sermon.title}</h3>
-                <p className="text-muted-foreground text-sm mb-3">{sermon.preacher}</p>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{sermon.duration}</span>
-                  <span>{sermon.date}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-lg">No sermons found matching your criteria.</p>
+            <Button variant="outline" className="mt-4" asChild>
+              <Link href="/sermons">Clear Filters</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

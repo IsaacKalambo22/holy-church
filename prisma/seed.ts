@@ -60,6 +60,7 @@ async function main() {
   const sermon1 = await prisma.sermon.create({
     data: {
       title: 'Walking in the Spirit',
+      slug: 'walking-in-the-spirit',
       description: 'A powerful message about living by the Holy Spirit',
       series: 'Faith Series',
       published: true,
@@ -71,6 +72,7 @@ async function main() {
   const sermon2 = await prisma.sermon.create({
     data: {
       title: 'The Grace of God',
+      slug: 'the-grace-of-god',
       description: 'Understanding God\'s unmerited favor',
       series: 'Grace Series',
       published: true,
