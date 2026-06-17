@@ -166,20 +166,51 @@ model MediaCategory {
 }
 
 model Donation {
-  id        String   @id @default(uuid())
-  amount    Float?
-  fund      String   @default("general")
-  donor     User?    @relation(fields: [donorId], references: [id])
-  donorId   String?
-  message   String?
-  deletedAt DateTime? @db.Timestamptz
-  createdAt DateTime @default(now()) @db.Timestamptz
+  id              String   @id @default(uuid())
+  amount          Float
+  currency        String   @default("MWK")
+  category        String   @default("general")
+  paymentStatus   String   @default("PENDING")
+  transactionId   String?
+  donorName       String?
+  donorEmail      String?
+  isAnonymous     Boolean  @default(false)
+  donor           User?    @relation(fields: [donorId], references: [id])
+  donorId         String?
+  message         String?
+  deletedAt       DateTime? @db.Timestamptz
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
 
   @@index([donorId])
-  @@index([fund])
+  @@index([category])
+  @@index([paymentStatus])
   @@index([createdAt])
   @@index([deletedAt])
   @@map("donations")
+}
+
+model DonationCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([slug])
+  @@map("donation_categories")
+}
+
+model DonationReceipt {
+  id            String   @id @default(uuid())
+  donationId    String
+  receiptNumber String   @unique
+  issuedAt      DateTime @default(now()) @db.Timestamptz
+
+  @@index([donationId])
+  @@index([receiptNumber])
+  @@map("donation_receipts")
 }
 
 model Blog {

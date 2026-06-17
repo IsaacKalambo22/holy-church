@@ -217,13 +217,13 @@ async function main() {
     data: [
       {
         amount: 5000,
-        fund: 'general',
+        category: 'general',
         donorId: member.id,
         message: 'Thank you for all you do.',
       },
       {
         amount: 10000,
-        fund: 'missions',
+        category: 'missions',
         donorId: member.id,
       },
     ],
