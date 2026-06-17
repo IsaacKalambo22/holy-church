@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,7 +30,12 @@ async function getBlogPosts(searchParams: {
   params.set('page', searchParams.page || '1')
   params.set('limit', '9')
 
-  const response = await fetch(`/api/blog?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
     next: { revalidate: 300 },
   })
 
@@ -41,7 +47,12 @@ async function getBlogPosts(searchParams: {
 }
 
 async function getCategories() {
-  const response = await fetch(`/api/blog/categories`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/blog/categories`, {
     next: { revalidate: 3600 },
   })
 

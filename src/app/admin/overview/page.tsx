@@ -1,4 +1,5 @@
 import { getSession } from '@/lib/auth-middleware'
+import { headers } from 'next/headers'
 import { FlameHero } from '@/components/shared/FlameHero'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, Calendar, Heart, BookOpen, TrendingUp, FileText, Layers } from 'lucide-react'
@@ -8,7 +9,12 @@ async function getAdminOverview() {
   const session = await getSession()
   if (!session) return null
 
-  const response = await fetch(`/api/admin/overview`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+
+  const response = await fetch(`${baseUrl}/api/admin/overview`, {
     cache: 'no-store',
     headers: {
       Authorization: `Bearer ${session.token}`,

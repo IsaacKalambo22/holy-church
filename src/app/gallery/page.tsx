@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Button } from '@/components/ui/button'
 import { AlbumCard } from '@/components/shared/AlbumCard'
 import Link from 'next/link'
@@ -19,7 +20,12 @@ async function getAlbums(page: string = '1') {
   params.set('page', page)
   params.set('limit', '12')
 
-  const response = await fetch(`/api/gallery/albums?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+
+  const response = await fetch(`${baseUrl}/api/gallery/albums?${params.toString()}`, {
     next: { revalidate: 600 },
   })
 

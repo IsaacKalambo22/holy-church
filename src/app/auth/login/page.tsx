@@ -37,6 +37,10 @@ export default function LoginPage() {
       }
 
       login(data.data.user, data.data.token)
+      
+      // Set cookie for server-side auth
+      document.cookie = `auth-token=${data.data.token}; path=/; max-age=604800; secure; samesite=strict`
+      
       router.push('/dashboard')
     } catch {
       setError('An error occurred. Please try again.')

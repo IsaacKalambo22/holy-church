@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Mail, Phone, Users, ArrowLeft, Clock } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -7,7 +8,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getMinistry(slug: string) {
-  const response = await fetch(`/api/ministries/slug/${slug}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/ministries/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -37,7 +43,12 @@ async function getRelatedMinistries(category?: string) {
   params.set('limit', '4')
   if (category) params.set('category', category)
   
-  const response = await fetch(`/api/ministries?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/ministries?${params.toString()}`, {
     cache: 'no-store',
   })
 

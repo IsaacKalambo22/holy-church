@@ -1,11 +1,17 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { ArrowLeft, Image as ImageIcon } from 'lucide-react'
 import { MediaCard } from '@/components/shared/MediaCard'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getAlbum(slug: string) {
-  const response = await fetch(`/api/gallery/albums/slug/${slug}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/gallery/albums/slug/${slug}`, {
     cache: 'no-store',
   })
 

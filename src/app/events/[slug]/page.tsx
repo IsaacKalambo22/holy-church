@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Calendar, MapPin, Clock, Users, Share2, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -8,7 +9,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getEvent(slug: string) {
-  const response = await fetch(`/api/events/slug/${slug}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/events/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -41,7 +47,12 @@ async function getRelatedEvents(category?: string) {
   params.set('limit', '4')
   if (category) params.set('category', category)
   
-  const response = await fetch(`/api/events?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/events?${params.toString()}`, {
     cache: 'no-store',
   })
 

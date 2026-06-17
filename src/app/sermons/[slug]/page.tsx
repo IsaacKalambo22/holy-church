@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Play, Calendar, User, Share2, Heart, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -7,7 +8,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getSermon(slug: string) {
-  const response = await fetch(`/api/sermons/slug/${slug}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/sermons/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -24,7 +30,12 @@ async function getRelatedSermons(sermonId: string, series?: string) {
   params.set('limit', '4')
   if (series) params.set('series', series)
   
-  const response = await fetch(`/api/sermons?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/sermons?${params.toString()}`, {
     cache: 'no-store',
   })
 

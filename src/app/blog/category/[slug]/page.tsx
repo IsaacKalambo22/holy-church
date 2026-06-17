@@ -1,11 +1,17 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Button } from '@/components/ui/button'
 import { BlogCard } from '@/components/shared/BlogCard'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getCategory(slug: string) {
-  const response = await fetch(`/api/blog/categories`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/blog/categories`, {
     cache: 'no-store',
   })
 
@@ -24,7 +30,12 @@ async function getBlogPosts(categoryId: string, page: string = '1') {
   params.set('page', page)
   params.set('limit', '9')
 
-  const response = await fetch(`/api/blog?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+
+  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
     cache: 'no-store',
   })
 

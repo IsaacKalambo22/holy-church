@@ -1,3 +1,4 @@
+import { headers } from 'next/headers'
 import { FlameHero } from '@/components/shared/FlameHero'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -20,7 +21,12 @@ async function getSearchResults(query: string, type?: string) {
   params.append('q', query)
   if (type) params.append('type', type)
 
-  const response = await fetch(`/api/search?${params}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+
+  const response = await fetch(`${baseUrl}/api/search?${params}`, {
     cache: 'no-store',
   })
 

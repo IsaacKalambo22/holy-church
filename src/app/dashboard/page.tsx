@@ -1,4 +1,5 @@
 import { getSession } from '@/lib/auth-middleware'
+import { headers } from 'next/headers'
 import { FlameHero } from '@/components/shared/FlameHero'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -6,7 +7,12 @@ import { Calendar, Heart, BookOpen, User, Settings, LogOut, TrendingUp } from 'l
 import Link from 'next/link'
 
 async function getDashboardData(userId: string) {
-  const response = await fetch(`/api/member/dashboard`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/member/dashboard`, {
     cache: 'no-store',
     headers: {
       Cookie: `session=${userId}`,

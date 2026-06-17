@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Heart, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -28,7 +29,12 @@ async function getPrayers(searchParams: {
   params.set('page', searchParams.page || '1')
   params.set('limit', '20')
 
-  const response = await fetch(`/api/prayer?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+
+  const response = await fetch(`${baseUrl}/api/prayer?${params.toString()}`, {
     next: { revalidate: 60 },
   })
 

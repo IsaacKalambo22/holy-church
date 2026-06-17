@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Calendar, User, ArrowLeft, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -7,7 +8,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 async function getBlogPost(slug: string) {
-  const response = await fetch(`/api/blog/slug/${slug}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/blog/slug/${slug}`, {
     cache: 'no-store',
   })
 
@@ -39,7 +45,12 @@ async function getRelatedPosts(categoryId?: string) {
   params.set('categoryId', categoryId)
   params.set('limit', '4')
   
-  const response = await fetch(`/api/blog?${params.toString()}`, {
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = headersList.get('x-forwarded-proto') || 'http'
+  const baseUrl = `${protocol}://${host}`
+  
+  const response = await fetch(`${baseUrl}/api/blog?${params.toString()}`, {
     cache: 'no-store',
   })
 
