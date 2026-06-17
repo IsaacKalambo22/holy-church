@@ -30,50 +30,77 @@ export default async function DashboardPage() {
   const session = await getSession()
 
   if (!session) {
-    return null
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Please sign in to access your dashboard</p>
+          <Button asChild>
+            <Link href="/login">Sign In</Link>
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   const dashboardData = await getDashboardData(session.user.id)
+  const data = dashboardData?.data
 
   return (
     <div className="min-h-screen bg-background">
       <FlameHero
-        title={`Welcome, ${session.user.name}`}
+        title={`Welcome, ${session.user.name || 'Member'}`}
         description="Manage your church membership and activities"
         badge="Member Dashboard"
       />
 
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Giving Summary */}
-        {dashboardData?.data?.givingSummary && (
-          <Card className="mb-8 bg-gradient-to-br from-purple-500/10 to-indigo-600/10 border-purple-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
-                Your Giving Summary
-              </CardTitle>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Given</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Given</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    MWK {dashboardData.data.givingSummary.total.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Donations</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {dashboardData.data.givingSummary.count}
-                  </p>
-                </div>
-              </div>
+              <p className="text-2xl font-bold">
+                MWK {data?.givingSummary?.total?.toLocaleString() || '0'}
+              </p>
             </CardContent>
           </Card>
-        )}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Donations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
+                {data?.givingSummary?.count || '0'}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Events</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
+                {data?.upcomingEvents?.length || '0'}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Prayer Requests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
+                {data?.recentPrayerRequests?.length || '0'}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
+        {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <Card className="hover:shadow-md transition-all">
+          <Card className="hover:shadow-md transition-all cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-primary" />
@@ -82,18 +109,13 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm mb-4">View and manage your event registrations</p>
-              {dashboardData?.data?.upcomingEvents && dashboardData.data.upcomingEvents.length > 0 && (
-                <p className="text-xs text-muted-foreground mb-4">
-                  {dashboardData.data.upcomingEvents.length} upcoming event{dashboardData.data.upcomingEvents.length !== 1 ? 's' : ''}
-                </p>
-              )}
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard/events">View Events</Link>
+              <Button variant="outline" size="sm" asChild className="w-full">
+                <Link href="/events">Browse Events</Link>
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-md transition-all">
+          <Card className="hover:shadow-md transition-all cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Heart className="w-5 h-5 text-primary" />
@@ -102,73 +124,64 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm mb-4">Submit and track your prayer requests</p>
-              {dashboardData?.data?.recentPrayerRequests && dashboardData.data.recentPrayerRequests.length > 0 && (
-                <p className="text-xs text-muted-foreground mb-4">
-                  {dashboardData.data.recentPrayerRequests.length} recent request{dashboardData.data.recentPrayerRequests.length !== 1 ? 's' : ''}
-                </p>
-              )}
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard/prayer">Manage Requests</Link>
+              <Button variant="outline" size="sm" asChild className="w-full">
+                <Link href="/prayer/wall">Prayer Wall</Link>
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-md transition-all">
+          <Card className="hover:shadow-md transition-all cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-primary" />
-                Giving History
+                Giving
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground text-sm mb-4">View your donation history and receipts</p>
-              {dashboardData?.data?.recentDonations && dashboardData.data.recentDonations.length > 0 && (
-                <p className="text-xs text-muted-foreground mb-4">
-                  {dashboardData.data.recentDonations.length} recent donation{dashboardData.data.recentDonations.length !== 1 ? 's' : ''}
-                </p>
-              )}
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard/giving">View History</Link>
+              <p className="text-muted-foreground text-sm mb-4">Make a donation to support the church</p>
+              <Button variant="outline" size="sm" asChild className="w-full">
+                <Link href="/giving">Give Now</Link>
               </Button>
             </CardContent>
           </Card>
         </div>
 
+        {/* Profile Section */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
-              Profile Settings
+              Profile Information
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Name</p>
-                <p className="text-foreground">{session.user.name}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Email</p>
-                <p className="text-foreground">{session.user.email}</p>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Name</p>
+                <p className="text-foreground font-medium">{session.user.name || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Role</p>
-                <p className="text-foreground">{session.user.role}</p>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Email</p>
+                <p className="text-foreground font-medium">{session.user.email || 'N/A'}</p>
               </div>
-              <div className="pt-4 flex gap-3">
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/dashboard/settings">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Link>
-                </Button>
-                <Button variant="destructive" size="sm" asChild>
-                  <Link href="/auth/logout">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </Link>
-                </Button>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Role</p>
+                <p className="text-foreground font-medium">{session.user.role || 'MEMBER'}</p>
               </div>
+            </div>
+            <div className="pt-6 flex gap-3">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/dashboard/settings">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </Link>
+              </Button>
+              <Button variant="destructive" size="sm" asChild>
+                <Link href="/auth/logout">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

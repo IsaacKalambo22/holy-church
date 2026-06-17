@@ -54,7 +54,14 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         set.status = 401
         return { success: false, error: 'Invalid credentials' }
       }
-      const token = await jwt.sign({ userId: user.id, role: user.role })
+      const token = await jwt.sign({ 
+        userId: user.id, 
+        email: user.email, 
+        name: user.name, 
+        role: user.role, 
+        avatar: user.avatar,
+        isVerified: user.isVerified 
+      })
       await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } })
       return {
         success: true,

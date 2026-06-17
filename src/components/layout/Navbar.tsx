@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react'
+import { Menu, X, ChevronDown, Sun, Moon, User, LogOut } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { GlobalSearch } from '@/components/shared/GlobalSearch'
+import { useAuthStore } from '@/store/auth-store'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -32,6 +33,13 @@ export function Navbar() {
   const { theme, setTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const { user, logout, isAuthenticated } = useAuthStore()
+
+  const handleLogout = () => {
+    logout()
+    document.cookie = 'auth-token=; path=/; max-age=0'
+    window.location.href = '/'
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -114,12 +122,28 @@ export function Navbar() {
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
-            <Button variant="brand" size="sm" asChild>
-              <Link href="/giving">Give Now</Link>
-            </Button>
+            {isAuthenticated() ? (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/dashboard">
+                    <User className="w-4 h-4 mr-2" />
+                    {user?.name?.split(' ')[0] || 'Dashboard'}
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/login">Sign In</Link>
+                </Button>
+                <Button variant="brand" size="sm" asChild>
+                  <Link href="/giving">Give Now</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -190,12 +214,29 @@ export function Navbar() {
                 )
               )}
               <div className="pt-3 flex flex-col gap-2">
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="/login">Sign In</Link>
-                </Button>
-                <Button variant="brand" asChild className="w-full">
-                  <Link href="/giving">Give Now</Link>
-                </Button>
+                {isAuthenticated() ? (
+                  <>
+                    <Button variant="outline" asChild className="w-full">
+                      <Link href="/dashboard">
+                        <User className="w-4 h-4 mr-2" />
+                        {user?.name || 'Dashboard'}
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" className="w-full" onClick={handleLogout}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild className="w-full">
+                      <Link href="/login">Sign In</Link>
+                    </Button>
+                    <Button variant="brand" asChild className="w-full">
+                      <Link href="/giving">Give Now</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
