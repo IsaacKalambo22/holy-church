@@ -1,5 +1,5 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// learn more about in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -31,8 +31,14 @@ model User {
   resetPasswordExpiresAt     DateTime?
   verificationToken          String?
   verificationTokenExpiresAt DateTime?
-  createdAt                  DateTime  @default(now())
-  updatedAt                  DateTime  @updatedAt
+  deletedAt                  DateTime?  @db.Timestamptz
+  createdAt                  DateTime  @default(now()) @db.Timestamptz
+  updatedAt                  DateTime  @updatedAt @db.Timestamptz
+
+  @@index([email])
+  @@index([role])
+  @@index([deletedAt])
+  @@map("users")
 
   sermons        Sermon[]
   donations      Donation[]
@@ -46,7 +52,7 @@ model Sermon {
   id           String   @id @default(uuid())
   title        String
   description  String?
-  date         DateTime @default(now())
+  date         DateTime @default(now()) @db.Timestamptz
   videoUrl     String?
   audioUrl     String?
   thumbnailUrl String?
@@ -55,59 +61,100 @@ model Sermon {
   views        Int      @default(0)
   preacher     User?    @relation(fields: [preacherId], references: [id])
   preacherId   String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime? @db.Timestamptz
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  @@index([published])
+  @@index([date])
+  @@index([series])
+  @@index([deletedAt])
+  @@map("sermons")
 }
 
 model Event {
   id          String   @id @default(uuid())
   title       String
   description String?
-  date        DateTime
-  endDate     DateTime?
+  date        DateTime @db.Timestamptz
+  endDate     DateTime? @db.Timestamptz
   location    String?
   imageUrl    String?
   category    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime? @db.Timestamptz
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([date])
+  @@index([category])
+  @@index([deletedAt])
+  @@map("events")
 }
 
 model Gallery {
   id        String   @id @default(uuid())
   caption   String
   imageUrls String[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deletedAt DateTime? @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  @@index([deletedAt])
+  @@map("galleries")
 }
 
 model Donation {
-  id          String  @id @default(uuid())
-  amount      Float?
-  donor       User?    @relation(fields: [donorId], references: [id])
-  donorId     String?
-  message     String?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  amount    Float?
+  fund      String   @default("general")
+  donor     User?    @relation(fields: [donorId], references: [id])
+  donorId   String?
+  message   String?
+  deletedAt DateTime? @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@index([donorId])
+  @@index([fund])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("donations")
 }
 
 model Blog {
-  id          String  @id @default(uuid())
-  title       String
-  content     String?
-  author      User?     @relation(fields: [authorId], references: [id])
-  authorId    String?
+  id           String   @id @default(uuid())
+  title        String
+  content      String?
+  slug         String   @unique
+  author       User?    @relation(fields: [authorId], references: [id])
+  authorId     String?
   thumbnailUrl String?
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  published    Boolean  @default(false)
+  publishedAt  DateTime? @db.Timestamptz
+  deletedAt    DateTime? @db.Timestamptz
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  @@index([published])
+  @@index([slug])
+  @@index([publishedAt])
+  @@index([deletedAt])
+  @@map("blogs")
 }
 
 model PrayerRequest {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   request     String?
   isAnonymous Boolean  @default(false)
+  status      String   @default("PENDING")
   user        User?    @relation(fields: [userId], references: [id])
   userId      String?
-  createdAt   DateTime @default(now())
+  deletedAt   DateTime? @db.Timestamptz
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("prayer_requests")
 }
 
 model Podcast {
@@ -121,9 +168,15 @@ model Podcast {
   speaker      User?    @relation(fields: [speakerId], references: [id])
   speakerId    String?
   published    Boolean  @default(false)
-  publishedAt  DateTime @default(now())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  publishedAt  DateTime? @db.Timestamptz
+  deletedAt    DateTime? @db.Timestamptz
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  @@index([published])
+  @@index([publishedAt])
+  @@index([deletedAt])
+  @@map("podcasts")
 }
 
 model Ministry {
@@ -133,8 +186,12 @@ model Ministry {
   imageUrl    String?
   leader      User?    @relation(fields: [leaderId], references: [id])
   leaderId    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime? @db.Timestamptz
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  @@index([deletedAt])
+  @@map("ministries")
 }
 
 model ContactMessage {
@@ -144,12 +201,22 @@ model ContactMessage {
   subject   String?
   message   String
   read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  deletedAt DateTime? @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@index([read])
+  @@index([deletedAt])
+  @@map("contact_messages")
 }
 
 model NewsletterSubscriber {
   id        String   @id @default(uuid())
   email     String   @unique
   active    Boolean  @default(true)
-  createdAt DateTime @default(now())
+  deletedAt DateTime? @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@index([active])
+  @@index([deletedAt])
+  @@map("newsletter_subscribers")
 }

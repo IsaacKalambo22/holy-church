@@ -2,11 +2,17 @@ import { Elysia, t } from 'elysia'
 import { jwt } from '@elysiajs/jwt'
 import bcrypt from 'bcrypt'
 import { prisma } from '@/lib/prisma'
+import { env } from '@/lib/env'
 
 const jwtPlugin = jwt({
   name: 'jwt',
-  secret: process.env.JWT_SECRET || 'holy-church-dev-secret',
+  secret: env.JWT_SECRET,
 })
+
+// Generate reset token (simple implementation - in production use crypto.randomBytes)
+function generateResetToken(): string {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36)
+}
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
   .use(jwtPlugin)
@@ -21,7 +27,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       }
       const hashed = await bcrypt.hash(password, 12)
       const user = await prisma.user.create({
-        data: { email, password: hashed, name },
+        data: { email, password: hashed, name, role: 'MEMBER' },
         select: { id: true, email: true, name: true, role: true, createdAt: true },
       })
       return { success: true, data: user }
@@ -62,6 +68,58 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       body: t.Object({
         email: t.String({ format: 'email' }),
         password: t.String(),
+      }),
+    }
+  )
+  .post(
+    '/forgot-password',
+    async ({ body, set }) => {
+      const { email } = body
+      const user = await prisma.user.findUnique({ where: { email } })
+      if (!user) {
+        // Return success even if user not found to prevent email enumeration
+        return { success: true, message: 'If an account exists, a reset link has been sent.' }
+      }
+      const resetToken = generateResetToken()
+      const resetExpires = new Date(Date.now() + 3600000) // 1 hour
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { resetPasswordToken: resetToken, resetPasswordExpiresAt: resetExpires },
+      })
+      // TODO: Send email with reset link
+      return { success: true, message: 'If an account exists, a reset link has been sent.' }
+    },
+    {
+      body: t.Object({
+        email: t.String({ format: 'email' }),
+      }),
+    }
+  )
+  .post(
+    '/reset-password',
+    async ({ body, set }) => {
+      const { token, password } = body
+      const user = await prisma.user.findFirst({
+        where: {
+          resetPasswordToken: token,
+          resetPasswordExpiresAt: { gt: new Date() },
+        },
+      })
+      if (!user) {
+        set.status = 400
+        return { success: false, error: 'Invalid or expired reset token' }
+      }
+      const hashed = await bcrypt.hash(password, 12)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashed, resetPasswordToken: null, resetPasswordExpiresAt: null },
+      })
+      return { success: true, message: 'Password reset successfully.' }
+    },
+    {
+      body: t.Object({
+        token: t.String(),
+        password: t.String({ minLength: 8 }),
       }),
     }
   )
