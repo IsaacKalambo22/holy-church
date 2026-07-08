@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Bell, Check, CheckCheck, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 interface Notification {
   id: string
@@ -30,7 +31,7 @@ export default function MemberNotificationsPage() {
         const params = new URLSearchParams()
         if (filter === 'unread') params.append('unreadOnly', 'true')
 
-        const response = await fetch(`/api/notifications?${params}`)
+        const response = await apiFetch(`/api/notifications?${params}`)
         if (response.ok) {
           const result = await response.json()
           setNotifications(result.data || [])
@@ -47,7 +48,7 @@ export default function MemberNotificationsPage() {
 
   const markAsRead = async (id: string) => {
     try {
-      await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
+      await apiFetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
       setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)))
       setUnreadCount(Math.max(0, unreadCount - 1))
     } catch {
@@ -57,7 +58,7 @@ export default function MemberNotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      await fetch(`/api/notifications/read-all`, { method: 'PATCH' })
+      await apiFetch(`/api/notifications/read-all`, { method: 'PATCH' })
       setNotifications(notifications.map((n) => ({ ...n, read: true })))
       setUnreadCount(0)
     } catch {
@@ -67,7 +68,7 @@ export default function MemberNotificationsPage() {
 
   const deleteNotification = async (id: string) => {
     try {
-      await fetch(`/api/notifications/${id}`, { method: 'DELETE' })
+      await apiFetch(`/api/notifications/${id}`, { method: 'DELETE' })
       setNotifications(notifications.filter((n) => n.id !== id))
       if (!notifications.find((n) => n.id === id)?.read) {
         setUnreadCount(Math.max(0, unreadCount - 1))

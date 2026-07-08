@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Search, Users, DollarSign, FileText, Shield } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 interface SearchResult {
   id: string
@@ -33,7 +34,7 @@ export default function AdminSearchPage() {
       params.append('q', query)
       if (type) params.append('type', type)
 
-      const response = await fetch(`/api/search?${params}`)
+      const response = await apiFetch(`/api/search?${params}`)
       if (response.ok) {
         const data = await response.json()
         setResults(data.data?.results || [])

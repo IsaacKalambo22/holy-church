@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Search, ShieldCheck, User } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 interface Member {
   id: string
@@ -31,7 +32,7 @@ export default function AdminMembersPage() {
         if (search) params.append('search', search)
         if (roleFilter) params.append('role', roleFilter)
 
-        const response = await fetch(`/api/admin/members?${params}`)
+        const response = await apiFetch(`/api/admin/members?${params}`)
         if (response.ok) {
           const result = await response.json()
           setMembers(result.data || [])

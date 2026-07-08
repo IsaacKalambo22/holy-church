@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Calendar, Heart, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 interface Activity {
   id: string
@@ -24,7 +25,7 @@ export default function ActivityPage() {
   useEffect(() => {
     async function loadActivities() {
       try {
-        const response = await fetch(`/api/member/activity`)
+        const response = await apiFetch(`/api/member/activity`)
         if (response.ok) {
           const result = await response.json()
           setActivities(result.data || [])
@@ -97,7 +98,7 @@ export default function ActivityPage() {
               <Card key={activity.id} className="hover:shadow-md transition-all">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">

@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, Send, Users } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 export default function AdminBroadcastPage() {
   const [sending, setSending] = useState(false)
@@ -46,7 +47,7 @@ export default function AdminBroadcastPage() {
 
     setSending(true)
     try {
-      const response = await fetch(`/api/notifications/broadcast`, {
+      const response = await apiFetch(`/api/notifications/broadcast`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

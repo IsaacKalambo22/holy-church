@@ -11,7 +11,21 @@ const eslintConfig = [
 
   // Ignore patterns
   {
-    ignores: ['.next/**', 'node_modules/**', 'dist/**', 'build/**', 'public/**'],
+    ignores: ['.next/**', 'node_modules/**', 'dist/**', 'build/**', 'public/**', 'next-env.d.ts'],
+  },
+
+  // CommonJS config files (e.g. postcss.config.js) use `module`, `require`, etc.
+  {
+    files: ['**/*.js', '**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        module: 'readonly',
+        require: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+      },
+    },
   },
 
   // TypeScript + Next.js files

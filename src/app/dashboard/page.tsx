@@ -4,16 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Heart, BookOpen, User, TrendingUp, Users, DollarSign, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 
-async function getDashboardData(userId: string) {
+interface RecentPrayerRequest {
+  id: string
+  title?: string | null
+  description?: string | null
+  createdAt: string
+}
+
+async function getDashboardData(token: string) {
   const headersList = await headers()
   const host = headersList.get('host') || 'localhost:3000'
   const protocol = headersList.get('x-forwarded-proto') || 'http'
   const baseUrl = `${protocol}://${host}`
-  
+
+  // The member API authenticates via a Bearer token, so forward the session's
+  // JWT in the Authorization header (a `session` cookie would never authorize).
   const response = await fetch(`${baseUrl}/api/member/dashboard`, {
     cache: 'no-store',
     headers: {
-      Cookie: `session=${userId}`,
+      Authorization: `Bearer ${token}`,
     },
   })
 
@@ -35,7 +44,7 @@ export default async function DashboardPage() {
     )
   }
 
-  const dashboardData = await getDashboardData(session.user.id)
+  const dashboardData = await getDashboardData(session.token)
   const data = dashboardData?.data
 
   return (
@@ -175,9 +184,9 @@ export default async function DashboardPage() {
           <CardContent className="pt-6">
             {data?.recentPrayerRequests && data.recentPrayerRequests.length > 0 ? (
               <div className="space-y-4">
-                {data.recentPrayerRequests.slice(0, 5).map((request: any) => (
+                {data.recentPrayerRequests.slice(0, 5).map((request: RecentPrayerRequest) => (
                   <div key={request.id} className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                       <Heart className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">

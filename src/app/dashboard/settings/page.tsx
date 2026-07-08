@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Label } from '@/components/ui/label'
 import { Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
@@ -23,7 +24,7 @@ export default function SettingsPage() {
   useEffect(() => {
     async function loadPreferences() {
       try {
-        const response = await fetch(`/api/member/preferences`)
+        const response = await apiFetch(`/api/member/preferences`)
         if (response.ok) {
           const result = await response.json()
           if (result.data) {
@@ -42,8 +43,7 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      const response = await fetch(`${baseUrl}/api/member/preferences`, {
+      const response = await apiFetch(`/api/member/preferences`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(preferences),

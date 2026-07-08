@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Search, Shield } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 interface AuditLog {
   id: string
@@ -37,7 +38,7 @@ export default function AdminAuditLogsPage() {
         if (search) params.append('search', search)
         if (actionFilter) params.append('action', actionFilter)
 
-        const response = await fetch(`/api/admin/audit-logs?${params}`)
+        const response = await apiFetch(`/api/admin/audit-logs?${params}`)
         if (response.ok) {
           const result = await response.json()
           setLogs(result.data || [])

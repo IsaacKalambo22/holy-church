@@ -17,24 +17,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/giving`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
   ]
 
-  const [sermons, events, ministries, blogs] = await Promise.all([
-    prisma.sermon.findMany({
-      where: { deletedAt: null, published: true },
-      select: { id: true, updatedAt: true },
-    }),
-    prisma.event.findMany({
-      where: { deletedAt: null, date: { gte: new Date() } },
-      select: { id: true, updatedAt: true },
-    }),
-    prisma.ministry.findMany({
-      where: { deletedAt: null, status: 'ACTIVE' },
-      select: { id: true, updatedAt: true },
-    }),
-    prisma.blog.findMany({
-      where: { deletedAt: null, status: 'PUBLISHED' },
-      select: { id: true, updatedAt: true },
-    }),
-  ])
+  // Dynamic entries require the database. If it's unreachable at build time,
+  // degrade gracefully to the static routes instead of failing the whole build.
+  let sermons: { id: string; updatedAt: Date }[] = []
+  let events: { id: string; updatedAt: Date }[] = []
+  let ministries: { id: string; updatedAt: Date }[] = []
+  let blogs: { id: string; updatedAt: Date }[] = []
+
+  try {
+    ;[sermons, events, ministries, blogs] = await Promise.all([
+      prisma.sermon.findMany({
+        where: { deletedAt: null, published: true },
+        select: { id: true, updatedAt: true },
+      }),
+      prisma.event.findMany({
+        where: { deletedAt: null, date: { gte: new Date() } },
+        select: { id: true, updatedAt: true },
+      }),
+      prisma.ministry.findMany({
+        where: { deletedAt: null, status: 'ACTIVE' },
+        select: { id: true, updatedAt: true },
+      }),
+      prisma.blog.findMany({
+        where: { deletedAt: null, published: true },
+        select: { id: true, updatedAt: true },
+      }),
+    ])
+  } catch (error) {
+    console.error('sitemap: failed to load dynamic entries, serving static routes only', error)
+  }
 
   const sermonPages = sermons.map((sermon) => ({
     url: `${siteUrl}/sermons/${sermon.id}`,

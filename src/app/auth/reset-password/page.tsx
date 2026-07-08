@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Lock, AlertCircle, CheckCircle } from 'lucide-react'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="flex items-center gap-3 p-4 rounded-lg bg-destructive/10 text-destructive">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 shrink-0" />
                 <p className="text-sm">{error}</p>
               </div>
             )}
@@ -140,5 +140,13 @@ export default function ResetPasswordPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }

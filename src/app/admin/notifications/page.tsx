@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, Send, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 
 export default function AdminNotificationsPage() {
   const [stats, setStats] = useState({
@@ -17,7 +18,7 @@ export default function AdminNotificationsPage() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const response = await fetch(`/api/notifications`)
+        const response = await apiFetch(`/api/notifications`)
         if (response.ok) {
           const result = await response.json()
           setStats({

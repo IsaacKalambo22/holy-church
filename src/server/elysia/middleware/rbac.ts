@@ -9,77 +9,57 @@ const jwtPlugin = jwt({
 
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'MEMBER'
 
+// NOTE: The auth checks below use `onBeforeHandle` with `{ as: 'scoped' }` so
+// that the hook propagates to the routes of the parent instance that `.use()`s
+// this guard. A plugin's lifecycle hooks are encapsulated by default, so a
+// plain `.derive(...)` here would NOT run for the consumer's routes, silently
+// leaving every "protected" endpoint open. Scoped hooks apply to routes
+// registered *after* the `.use(guard)` call in the consumer, which is exactly
+// where the protected routes live.
+
+function getPayload(auth: string | undefined, verify: (t: string) => Promise<unknown>) {
+  if (!auth?.startsWith('Bearer ')) return Promise.resolve(null)
+  return verify(auth.slice(7)).then((p) => p || null)
+}
+
 export const authGuard = new Elysia({ name: 'auth-guard' })
   .use(jwtPlugin)
-  .derive(async ({ jwt, headers, set }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
-      set.status = 401
-      throw new Error('Unauthorized: No token provided')
-    }
-
-    const payload = await jwt.verify(auth.slice(7))
+  .onBeforeHandle({ as: 'scoped' }, async ({ jwt, headers, set }) => {
+    const payload = await getPayload(headers.authorization, jwt.verify)
     if (!payload) {
       set.status = 401
-      throw new Error('Unauthorized: Invalid token')
-    }
-
-    return {
-      userId: payload.userId as string,
-      role: payload.role as UserRole,
+      return { success: false, error: 'Unauthorized' }
     }
   })
 
 export const adminGuard = new Elysia({ name: 'admin-guard' })
   .use(jwtPlugin)
-  .derive(async ({ jwt, headers, set }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
-      set.status = 401
-      throw new Error('Unauthorized: No token provided')
-    }
-
-    const payload = await jwt.verify(auth.slice(7))
+  .onBeforeHandle({ as: 'scoped' }, async ({ jwt, headers, set }) => {
+    const payload = (await getPayload(headers.authorization, jwt.verify)) as {
+      role?: UserRole
+    } | null
     if (!payload) {
       set.status = 401
-      throw new Error('Unauthorized: Invalid token')
+      return { success: false, error: 'Unauthorized' }
     }
-
-    const role = payload.role as UserRole
-    if (role !== 'SUPER_ADMIN' && role !== 'ADMIN') {
+    if (payload.role !== 'SUPER_ADMIN' && payload.role !== 'ADMIN') {
       set.status = 403
-      throw new Error('Forbidden: Insufficient permissions')
-    }
-
-    return {
-      userId: payload.userId as string,
-      role,
+      return { success: false, error: 'Forbidden: Insufficient permissions' }
     }
   })
 
 export const superAdminGuard = new Elysia({ name: 'super-admin-guard' })
   .use(jwtPlugin)
-  .derive(async ({ jwt, headers, set }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
-      set.status = 401
-      throw new Error('Unauthorized: No token provided')
-    }
-
-    const payload = await jwt.verify(auth.slice(7))
+  .onBeforeHandle({ as: 'scoped' }, async ({ jwt, headers, set }) => {
+    const payload = (await getPayload(headers.authorization, jwt.verify)) as {
+      role?: UserRole
+    } | null
     if (!payload) {
       set.status = 401
-      throw new Error('Unauthorized: Invalid token')
+      return { success: false, error: 'Unauthorized' }
     }
-
-    const role = payload.role as UserRole
-    if (role !== 'SUPER_ADMIN') {
+    if (payload.role !== 'SUPER_ADMIN') {
       set.status = 403
-      throw new Error('Forbidden: Insufficient permissions')
-    }
-
-    return {
-      userId: payload.userId as string,
-      role,
+      return { success: false, error: 'Forbidden: Insufficient permissions' }
     }
   })

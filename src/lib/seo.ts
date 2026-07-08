@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://holychurch.mw'
+const getSiteUrl = () => process.env.NEXT_PUBLIC_APP_URL || 'https://holychurch.mw'
+const siteUrl = getSiteUrl()
 
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -52,5 +53,5 @@ export function createMetadata(options: {
 }
 
 export function createCanonicalUrl(path: string): string {
-  return `${siteUrl}${path}`
+  return `${getSiteUrl()}${path}`
 }

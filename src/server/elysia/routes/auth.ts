@@ -1,17 +1,19 @@
 import { Elysia, t } from 'elysia'
 import { jwt } from '@elysiajs/jwt'
 import bcrypt from 'bcrypt'
+import { randomBytes } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { env } from '@/lib/env'
+import { sendEmail } from '@/lib/email'
 
 const jwtPlugin = jwt({
   name: 'jwt',
   secret: env.JWT_SECRET,
 })
 
-// Generate reset token (simple implementation - in production use crypto.randomBytes)
+// Cryptographically-secure, unguessable password-reset token.
 function generateResetToken(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36)
+  return randomBytes(32).toString('hex')
 }
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
@@ -93,7 +95,20 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         where: { id: user.id },
         data: { resetPasswordToken: resetToken, resetPasswordExpiresAt: resetExpires },
       })
-      // TODO: Send email with reset link
+
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      const resetUrl = `${appUrl}/auth/reset-password?token=${resetToken}`
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your Holy Church Assembly password',
+        html: `
+          <p>Hello ${user.name},</p>
+          <p>We received a request to reset your password. Click the link below to choose a new one. This link expires in 1 hour.</p>
+          <p><a href="${resetUrl}">Reset your password</a></p>
+          <p>If you didn't request this, you can safely ignore this email.</p>
+        `,
+      })
+
       return { success: true, message: 'If an account exists, a reset link has been sent.' }
     },
     {
