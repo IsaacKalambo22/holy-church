@@ -11,6 +11,7 @@ import { prayerRoutes } from './routes/prayer'
 import { blogRoutes } from './routes/blog'
 import { donationRoutes } from './routes/donations'
 import { galleryRoutes } from './routes/gallery'
+import { ministryRoutes } from './routes/ministries'
 import { contactRoutes } from './routes/contact'
 import { memberRoutes } from './routes/member'
 import { adminRoutes } from './routes/admin'
@@ -42,6 +43,7 @@ export const app = new Elysia({ prefix: '/api' })
   .use(blogRoutes)
   .use(donationRoutes)
   .use(galleryRoutes)
+  .use(ministryRoutes)
   .use(contactRoutes)
   .use(memberRoutes)
   .use(adminRoutes)
