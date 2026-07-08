@@ -1,17 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FlameHero } from '@/components/shared/FlameHero'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { Save, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { Save, Check } from 'lucide-react'
 import { apiFetch } from '@/lib/api-client'
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -42,6 +41,7 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setSaving(true)
+    setSaved(false)
     try {
       const response = await apiFetch(`/api/member/preferences`, {
         method: 'PATCH',
@@ -49,37 +49,30 @@ export default function SettingsPage() {
         body: JSON.stringify(preferences),
       })
       if (response.ok) {
-        alert('Preferences saved successfully')
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
       }
     } catch {
-      alert('Failed to save preferences')
+      // no-op; keep the form state so the user can retry
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <FlameHero
-        title="Settings"
-        description="Manage your account preferences and privacy settings"
-        badge="Member Settings"
-      />
+    <div className="mx-auto max-w-3xl">
+      <p className="mb-6 text-sm text-muted-foreground">
+        Manage your account preferences and privacy settings.
+      </p>
 
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <Button variant="ghost" size="sm" asChild className="mb-6">
-          <Link href="/dashboard">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Link>
-        </Button>
-
-        {loading ? (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground">Loading settings...</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
+      {loading ? (
+        <div className="space-y-4">
+          {[0, 1].map((i) => (
+            <div key={i} className="h-48 animate-pulse rounded-xl bg-muted" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Communication Preferences</CardTitle>
@@ -176,7 +169,13 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            <div className="flex justify-end">
+            <div className="flex items-center justify-end gap-3">
+              {saved && (
+                <span className="inline-flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
+                  <Check className="h-4 w-4" />
+                  Saved
+                </span>
+              )}
               <Button onClick={handleSave} disabled={saving}>
                 <Save className="w-4 h-4 mr-2" />
                 {saving ? 'Saving...' : 'Save Changes'}
@@ -184,7 +183,6 @@ export default function SettingsPage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   )
 }

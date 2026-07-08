@@ -1,6 +1,5 @@
 import { getSession } from '@/lib/auth-middleware'
 import { headers } from 'next/headers'
-import { FlameHero } from '@/components/shared/FlameHero'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, Calendar, Heart, BookOpen, TrendingUp, FileText, Layers } from 'lucide-react'
 import Link from 'next/link'
@@ -42,34 +41,29 @@ export default async function AdminOverviewPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background">
-      <FlameHero
-        title="Admin Overview"
-        description="Church administration dashboard and metrics"
-        badge="Administrator"
-      />
+    <div className="space-y-6">
+      <p className="text-sm text-muted-foreground">Church administration metrics and recent activity.</p>
 
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {metricCards.map((card) => (
-            <Card key={card.title} className="hover:shadow-md transition-all">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
-                  <div className={`w-10 h-10 rounded-lg ${card.bgColor} flex items-center justify-center`}>
-                    <card.icon className={`w-5 h-5 ${card.color}`} />
-                  </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {metricCards.map((card) => (
+          <Card key={card.title}>
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{card.title}</p>
+                  <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{card.value}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{card.subtitle}</p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-foreground">{card.value}</p>
-                <p className="text-sm text-muted-foreground">{card.subtitle}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${card.bgColor} dark:bg-primary/10`}>
+                  <card.icon className={`h-5 w-5 ${card.color} dark:text-primary`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
@@ -130,7 +124,6 @@ export default async function AdminOverviewPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
     </div>
   )
 }

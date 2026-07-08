@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Geist } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/providers/providers'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
+import { SiteChrome } from '@/components/layout/SiteChrome'
 import { StructuredData, createOrganizationSchema, createChurchSchema } from '@/components/seo/StructuredData'
 
 const inter = Inter({
@@ -51,9 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.variable} ${geist.variable} font-sans flex flex-col min-h-screen`}>
         <Providers>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
         </Providers>
       </body>
     </html>

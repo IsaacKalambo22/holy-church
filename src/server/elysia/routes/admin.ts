@@ -4,17 +4,8 @@ import { adminGuard } from '../middleware/rbac'
 
 export const adminRoutes = new Elysia({ prefix: '/admin' })
   .use(adminGuard)
-  .get('/overview', async ({ jwt, headers }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
-      return { success: false, error: 'Unauthorized' }
-    }
-
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
+  .get('/overview', async () => {
+    // Auth + role are enforced by adminGuard above.
     const [
       totalMembers,
       activeMembers,

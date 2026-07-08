@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ChevronDown, Sun, Moon, User, LogOut } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth-store'
@@ -34,7 +34,12 @@ export function Navbar() {
   const { theme, setTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
   const { user, logout, isAuthenticated } = useAuthStore()
+
+  // Theme/auth state only exist on the client; wait for mount to avoid an
+  // SSR/client hydration mismatch on the toggle icon and auth buttons.
+  useEffect(() => setMounted(true), [])
 
   const handleLogout = async () => {
     await logoutRequest()
@@ -119,10 +124,15 @@ export function Navbar() {
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {mounted ? (
+                theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />
+              ) : (
+                <div className="w-4 h-4" />
+              )}
             </button>
-            {isAuthenticated() ? (
+            {mounted && isAuthenticated() ? (
               <>
                 {user && isStaff(user.role) && (
                   <Button variant="outline" size="sm" asChild>
@@ -153,8 +163,13 @@ export function Navbar() {
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="p-2 rounded-lg text-muted-foreground hover:bg-accent"
+              aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {mounted ? (
+                theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />
+              ) : (
+                <div className="w-4 h-4" />
+              )}
             </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -216,7 +231,7 @@ export function Navbar() {
                 )
               )}
               <div className="pt-3 flex flex-col gap-2">
-                {isAuthenticated() ? (
+                {mounted && isAuthenticated() ? (
                   <>
                     {user && isStaff(user.role) && (
                       <Button variant="outline" asChild className="w-full">

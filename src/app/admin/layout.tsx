@@ -22,9 +22,5 @@ export default async function AdminLayout({
     redirect('/')
   }
 
-  return (
-    <DashboardShell title="Admin Dashboard" subtitle="Manage church administration">
-      {children}
-    </DashboardShell>
-  )
+  return <DashboardShell>{children}</DashboardShell>
 }

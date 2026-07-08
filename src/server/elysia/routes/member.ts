@@ -1,41 +1,38 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
 import { authGuard } from '../middleware/rbac'
+import { getTokenFromHeaders } from '@/lib/auth-cookie'
+
+type Headers = { authorization?: string; cookie?: string }
+type Verify = (t: string) => Promise<unknown>
+
+// Resolve the authenticated user id from either the HttpOnly cookie or a Bearer
+// header. The route is already protected by authGuard; this just reads the id.
+async function getUserId(headers: Headers, verify: Verify): Promise<string | null> {
+  const token = getTokenFromHeaders(headers)
+  if (!token) return null
+  const payload = (await verify(token)) as { userId?: string } | false
+  return payload && payload.userId ? payload.userId : null
+}
 
 export const memberRoutes = new Elysia({ prefix: '/member' })
   .use(authGuard)
-  .get('/dashboard', async ({ jwt, headers }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+  .get('/dashboard', async ({ jwt, headers, set }) => {
+    const userId = await getUserId(headers, jwt.verify)
+    if (!userId) {
+      set.status = 401
       return { success: false, error: 'Unauthorized' }
     }
 
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
-    const userId = payload.userId as string
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    })
-
+    const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) {
+      set.status = 404
       return { success: false, error: 'User not found' }
     }
 
-    const [
-      upcomingEvents,
-      recentPrayerRequests,
-      recentDonations,
-      preferences,
-    ] = await Promise.all([
+    const [upcomingEvents, recentPrayerRequests, recentDonations, preferences] = await Promise.all([
       prisma.event.findMany({
-        where: {
-          deletedAt: null,
-          date: { gte: new Date() },
-        },
+        where: { deletedAt: null, date: { gte: new Date() } },
         orderBy: { date: 'asc' },
         take: 3,
       }),
@@ -49,9 +46,7 @@ export const memberRoutes = new Elysia({ prefix: '/member' })
         orderBy: { createdAt: 'desc' },
         take: 3,
       }),
-      prisma.memberPreference.findUnique({
-        where: { userId },
-      }),
+      prisma.memberPreference.findUnique({ where: { userId } }),
     ])
 
     const totalDonations = await prisma.donation.aggregate({
@@ -81,18 +76,13 @@ export const memberRoutes = new Elysia({ prefix: '/member' })
       },
     }
   })
-  .get('/activity', async ({ jwt, headers, query }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+  .get('/activity', async ({ jwt, headers, query, set }) => {
+    const userId = await getUserId(headers, jwt.verify)
+    if (!userId) {
+      set.status = 401
       return { success: false, error: 'Unauthorized' }
     }
 
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
-    const userId = payload.userId as string
     const page = Number(query.page) || 1
     const limit = Number(query.limit) || 20
     const skip = (page - 1) * limit
@@ -153,27 +143,16 @@ export const memberRoutes = new Elysia({ prefix: '/member' })
       limit,
     }
   })
-  .get('/preferences', async ({ jwt, headers }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+  .get('/preferences', async ({ jwt, headers, set }) => {
+    const userId = await getUserId(headers, jwt.verify)
+    if (!userId) {
+      set.status = 401
       return { success: false, error: 'Unauthorized' }
     }
 
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
-    const userId = payload.userId as string
-
-    const preferences = await prisma.memberPreference.findUnique({
-      where: { userId },
-    })
-
+    const preferences = await prisma.memberPreference.findUnique({ where: { userId } })
     if (!preferences) {
-      const newPreferences = await prisma.memberPreference.create({
-        data: { userId },
-      })
+      const newPreferences = await prisma.memberPreference.create({ data: { userId } })
       return { success: true, data: newPreferences }
     }
 
@@ -181,18 +160,12 @@ export const memberRoutes = new Elysia({ prefix: '/member' })
   })
   .patch(
     '/preferences',
-    async ({ jwt, headers, body }) => {
-      const auth = headers.authorization
-      if (!auth?.startsWith('Bearer ')) {
+    async ({ jwt, headers, body, set }) => {
+      const userId = await getUserId(headers, jwt.verify)
+      if (!userId) {
+        set.status = 401
         return { success: false, error: 'Unauthorized' }
       }
-
-      const payload = await jwt.verify(auth.slice(7))
-      if (!payload) {
-        return { success: false, error: 'Invalid token' }
-      }
-
-      const userId = payload.userId as string
 
       const preferences = await prisma.memberPreference.upsert({
         where: { userId },

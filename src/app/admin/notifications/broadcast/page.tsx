@@ -1,14 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { FlameHero } from '@/components/shared/FlameHero'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Send, Users } from 'lucide-react'
-import Link from 'next/link'
+import { Send, Users } from 'lucide-react'
 import { apiFetch } from '@/lib/api-client'
 
 export default function AdminBroadcastPage() {
@@ -68,22 +66,8 @@ export default function AdminBroadcastPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <FlameHero
-        title="Send Broadcast"
-        description="Send a message to the entire church or specific groups"
-        badge="Administrator"
-      />
-
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <Button variant="ghost" size="sm" asChild className="mb-6">
-          <Link href="/admin/notifications">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Notifications
-          </Link>
-        </Button>
-
-        <Card>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <Card>
           <CardHeader>
             <CardTitle>Create Broadcast</CardTitle>
             <CardDescription>Send a notification to selected church members</CardDescription>
@@ -175,7 +159,6 @@ export default function AdminBroadcastPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   )
 }

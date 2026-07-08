@@ -1,12 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FlameHero } from '@/components/shared/FlameHero'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Calendar, Heart, TrendingUp } from 'lucide-react'
-import Link from 'next/link'
+import { Calendar, Heart, TrendingUp } from 'lucide-react'
 import { apiFetch } from '@/lib/api-client'
 
 interface Activity {
@@ -66,66 +63,62 @@ export default function ActivityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <FlameHero
-        title="My Activity"
-        description="View your recent activity and engagement with the church"
-        badge="Member Activity"
-      />
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Your recent activity and engagement with the church.
+      </p>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <Button variant="ghost" size="sm" asChild className="mb-6">
-          <Link href="/dashboard">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Link>
-        </Button>
-
-        {loading ? (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground">Loading activity...</p>
-          </div>
-        ) : activities.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-20">
-              <p className="text-muted-foreground text-lg mb-2">No activity yet</p>
-              <p className="text-sm text-muted-foreground">Your activity will appear here as you engage with the church.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {activities.map((activity) => (
-              <Card key={activity.id} className="hover:shadow-md transition-all">
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-foreground">{activity.title}</h3>
-                        <Badge variant="outline" className={getStatusColor(activity.status)}>
-                          {activity.status}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">{activity.description}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(activity.date).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
+      {loading ? (
+        <div className="space-y-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
+          ))}
+        </div>
+      ) : activities.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+              <Calendar className="h-6 w-6" />
+            </div>
+            <p className="mb-1 font-medium text-foreground">No activity yet</p>
+            <p className="text-sm text-muted-foreground">
+              Your activity will appear here as you engage with the church.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {activities.map((activity) => (
+            <Card key={activity.id} className="transition-shadow hover:shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                    {getActivityIcon(activity.type)}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <h3 className="truncate font-semibold text-foreground">{activity.title}</h3>
+                      <Badge variant="outline" className={getStatusColor(activity.status)}>
+                        {activity.status}
+                      </Badge>
+                    </div>
+                    <p className="mb-1 text-sm text-muted-foreground">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(activity.date).toLocaleDateString('en-GB', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

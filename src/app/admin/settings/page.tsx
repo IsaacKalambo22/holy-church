@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { FlameHero } from '@/components/shared/FlameHero'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowLeft, Save } from 'lucide-react'
-import Link from 'next/link'
+import { Save } from 'lucide-react'
 
 export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false)
@@ -35,22 +33,8 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <FlameHero
-        title="Site Settings"
-        description="Configure church information and site-wide settings"
-        badge="Administrator"
-      />
-
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <Button variant="ghost" size="sm" asChild className="mb-6">
-          <Link href="/admin">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Admin
-          </Link>
-        </Button>
-
-        <div className="space-y-6">
+    <div className="mx-auto max-w-4xl">
+      <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Church Information</CardTitle>
@@ -152,7 +136,6 @@ export default function AdminSettingsPage() {
             </Button>
           </div>
         </div>
-      </div>
     </div>
   )
 }

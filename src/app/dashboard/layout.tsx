@@ -19,9 +19,5 @@ export default async function DashboardLayout({
     redirect('/')
   }
 
-  return (
-    <DashboardShell title="Dashboard" subtitle="Manage your church">
-      {children}
-    </DashboardShell>
-  )
+  return <DashboardShell>{children}</DashboardShell>
 }

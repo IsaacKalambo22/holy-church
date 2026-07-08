@@ -1,21 +1,17 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
 import { authGuard, adminGuard } from '../middleware/rbac'
+import { getTokenFromHeaders } from '@/lib/auth-cookie'
 
 export const notificationRoutes = new Elysia({ prefix: '/notifications' })
   .use(authGuard)
   .get('/', async ({ jwt, headers, query }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+    const token = getTokenFromHeaders(headers)
+    const payload = token ? ((await jwt.verify(token)) as { userId?: string } | false) : null
+    if (!payload || !payload.userId) {
       return { success: false, error: 'Unauthorized' }
     }
-
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
-    const userId = payload.userId as string
+    const userId = payload.userId
     const page = Number(query.page) || 1
     const limit = Number(query.limit) || 20
     const skip = (page - 1) * limit
@@ -46,17 +42,12 @@ export const notificationRoutes = new Elysia({ prefix: '/notifications' })
     }
   })
   .patch('/:id/read', async ({ jwt, headers, params }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+    const token = getTokenFromHeaders(headers)
+    const payload = token ? ((await jwt.verify(token)) as { userId?: string } | false) : null
+    if (!payload || !payload.userId) {
       return { success: false, error: 'Unauthorized' }
     }
-
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
-    const userId = payload.userId as string
+    const userId = payload.userId
 
     const notification = await prisma.notification.update({
       where: { id: params.id, userId },
@@ -66,17 +57,12 @@ export const notificationRoutes = new Elysia({ prefix: '/notifications' })
     return { success: true, data: notification }
   })
   .patch('/read-all', async ({ jwt, headers }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+    const token = getTokenFromHeaders(headers)
+    const payload = token ? ((await jwt.verify(token)) as { userId?: string } | false) : null
+    if (!payload || !payload.userId) {
       return { success: false, error: 'Unauthorized' }
     }
-
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
-    const userId = payload.userId as string
+    const userId = payload.userId
 
     await prisma.notification.updateMany({
       where: { userId, read: false },
@@ -86,17 +72,12 @@ export const notificationRoutes = new Elysia({ prefix: '/notifications' })
     return { success: true }
   })
   .delete('/:id', async ({ jwt, headers, params }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+    const token = getTokenFromHeaders(headers)
+    const payload = token ? ((await jwt.verify(token)) as { userId?: string } | false) : null
+    if (!payload || !payload.userId) {
       return { success: false, error: 'Unauthorized' }
     }
-
-    const payload = await jwt.verify(auth.slice(7))
-    if (!payload) {
-      return { success: false, error: 'Invalid token' }
-    }
-
-    const userId = payload.userId as string
+    const userId = payload.userId
 
     await prisma.notification.delete({
       where: { id: params.id, userId },

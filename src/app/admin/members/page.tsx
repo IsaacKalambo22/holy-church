@@ -1,13 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FlameHero } from '@/components/shared/FlameHero'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Search, ShieldCheck, User } from 'lucide-react'
-import Link from 'next/link'
+import { Search, ShieldCheck, User } from 'lucide-react'
 import { apiFetch } from '@/lib/api-client'
 
 interface Member {
@@ -66,22 +63,8 @@ export default function AdminMembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <FlameHero
-        title="Member Management"
-        description="Manage church members and their roles"
-        badge="Administrator"
-      />
-
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <Button variant="ghost" size="sm" asChild className="mb-6">
-          <Link href="/admin">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Admin
-          </Link>
-        </Button>
-
-        <Card>
+    <div className="space-y-6">
+      <Card>
           <CardHeader>
             <CardTitle>Members</CardTitle>
           </CardHeader>
@@ -147,7 +130,6 @@ export default function AdminMembersPage() {
             )}
           </CardContent>
         </Card>
-      </div>
     </div>
   )
 }

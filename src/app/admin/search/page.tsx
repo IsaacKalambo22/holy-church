@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { FlameHero } from '@/components/shared/FlameHero'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Search, Users, DollarSign, FileText, Shield } from 'lucide-react'
+import { Search, Users, DollarSign, FileText, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { apiFetch } from '@/lib/api-client'
 
@@ -77,22 +76,8 @@ export default function AdminSearchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <FlameHero
-        title="Admin Search"
-        description="Search members, donations, notifications, and audit logs"
-        badge="Administrator"
-      />
-
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <Button variant="ghost" size="sm" asChild className="mb-6">
-          <Link href="/admin">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Admin
-          </Link>
-        </Button>
-
-        <Card>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Card>
           <CardHeader>
             <CardTitle>Search Administrative Records</CardTitle>
           </CardHeader>
@@ -174,7 +159,6 @@ export default function AdminSearchPage() {
             )}
           </CardContent>
         </Card>
-      </div>
     </div>
   )
 }
