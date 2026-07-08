@@ -3,6 +3,7 @@
 import { Bell, Search, User, LogOut, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth-store'
+import { logoutRequest } from '@/lib/api-client'
 import { useState } from 'react'
 
 interface DashboardHeaderProps {
@@ -14,14 +15,14 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
   const { user, logout } = useAuthStore()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutRequest()
     logout()
-    document.cookie = 'auth-token=; path=/; max-age=0'
     window.location.href = '/'
   }
 
   return (
-    <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="h-full px-6 flex items-center justify-between">
         {/* Page title */}
         <div>

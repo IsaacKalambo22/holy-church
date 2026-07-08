@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/store/auth-store'
+import { isStaff } from '@/lib/roles'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -36,12 +37,12 @@ export default function LoginPage() {
         return
       }
 
-      login(data.data.user, data.data.token)
-      
-      // Set cookie for server-side auth
-      document.cookie = `auth-token=${data.data.token}; path=/; max-age=604800; secure; samesite=strict`
-      
-      router.push('/dashboard')
+      // The server set an HttpOnly session cookie; we only keep the user profile
+      // client-side for display.
+      login(data.data.user)
+
+      // Only staff have a dashboard; members return to the public site.
+      router.push(isStaff(data.data.user.role) ? '/dashboard' : '/')
     } catch {
       setError('An error occurred. Please try again.')
     } finally {

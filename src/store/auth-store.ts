@@ -2,10 +2,13 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/types'
 
+// The session JWT lives in an HttpOnly cookie and is never exposed to JS, so the
+// store only holds the (non-sensitive) user profile for display. Same-origin API
+// calls authenticate via the cookie automatically. Auth truth is the cookie; the
+// persisted `user` is a UI convenience and may be stale until the next API call.
 interface AuthState {
   user: User | null
-  token: string | null
-  login: (user: User, token: string) => void
+  login: (user: User) => void
   logout: () => void
   isAuthenticated: () => boolean
 }
@@ -14,14 +17,13 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      token: null,
-      login: (user, token) => set({ user, token }),
-      logout: () => set({ user: null, token: null }),
-      isAuthenticated: () => !!get().token && !!get().user,
+      login: (user) => set({ user }),
+      logout: () => set({ user: null }),
+      isAuthenticated: () => !!get().user,
     }),
     {
       name: 'holy-church-auth',
-      partialize: (state) => ({ token: state.token, user: state.user }),
+      partialize: (state) => ({ user: state.user }),
     }
   )
 )

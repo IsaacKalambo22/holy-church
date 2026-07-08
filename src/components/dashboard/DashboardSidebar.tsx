@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth-store'
+import { ADMIN_ROLES, CONTENT_ROLES, FINANCE_ROLES } from '@/lib/roles'
 
 interface NavItem {
   title: string
@@ -49,40 +50,40 @@ const navigation: NavSection[] = [
   {
     title: 'CHURCH MANAGEMENT',
     items: [
-      { title: 'Members', href: '/admin/members', icon: <Users className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
-      { title: 'Ministries', href: '/admin/ministries', icon: <Church className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
-      { title: 'Events', href: '/admin/events', icon: <Calendar className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
-      { title: 'Sermons', href: '/admin/sermons', icon: <BookOpen className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
-      { title: 'Prayer Requests', href: '/admin/prayer', icon: <Heart className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
+      { title: 'Members', href: '/admin/members', icon: <Users className="w-4 h-4" />, roles: ADMIN_ROLES },
+      { title: 'Ministries', href: '/admin/ministries', icon: <Church className="w-4 h-4" />, roles: CONTENT_ROLES },
+      { title: 'Events', href: '/admin/events', icon: <Calendar className="w-4 h-4" />, roles: CONTENT_ROLES },
+      { title: 'Sermons', href: '/admin/sermons', icon: <BookOpen className="w-4 h-4" />, roles: CONTENT_ROLES },
+      { title: 'Prayer Requests', href: '/admin/prayer', icon: <Heart className="w-4 h-4" />, roles: CONTENT_ROLES },
     ],
   },
   {
     title: 'CONTENT',
     items: [
-      { title: 'Blog', href: '/admin/blog', icon: <FileText className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
-      { title: 'Gallery & Media', href: '/admin/gallery', icon: <Image className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
+      { title: 'Blog', href: '/admin/blog', icon: <FileText className="w-4 h-4" />, roles: CONTENT_ROLES },
+      { title: 'Gallery & Media', href: '/admin/gallery', icon: <Image className="w-4 h-4" />, roles: CONTENT_ROLES },
     ],
   },
   {
     title: 'FINANCE',
     items: [
-      { title: 'Donations', href: '/admin/donations', icon: <DollarSign className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN', 'FINANCE_MANAGER'] },
-      { title: 'Financial Reports', href: '/admin/reports', icon: <FileText className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN', 'FINANCE_MANAGER'] },
+      { title: 'Donations', href: '/admin/donations', icon: <DollarSign className="w-4 h-4" />, roles: FINANCE_ROLES },
+      { title: 'Financial Reports', href: '/admin/reports', icon: <FileText className="w-4 h-4" />, roles: FINANCE_ROLES },
     ],
   },
   {
     title: 'COMMUNICATION',
     items: [
-      { title: 'Notifications', href: '/admin/notifications', icon: <Bell className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
-      { title: 'Broadcasts', href: '/admin/broadcasts', icon: <Bell className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
+      { title: 'Notifications', href: '/admin/notifications', icon: <Bell className="w-4 h-4" />, roles: ADMIN_ROLES },
+      { title: 'Broadcasts', href: '/admin/broadcasts', icon: <Bell className="w-4 h-4" />, roles: ADMIN_ROLES },
     ],
   },
   {
     title: 'SYSTEM',
     items: [
-      { title: 'Search', href: '/admin/search', icon: <Search className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
+      { title: 'Search', href: '/admin/search', icon: <Search className="w-4 h-4" />, roles: ADMIN_ROLES },
       { title: 'Audit Logs', href: '/admin/audit-logs', icon: <FileAudit className="w-4 h-4" />, roles: ['SUPER_ADMIN'] },
-      { title: 'Settings', href: '/admin/settings', icon: <Settings className="w-4 h-4" />, roles: ['SUPER_ADMIN', 'ADMIN'] },
+      { title: 'Settings', href: '/admin/settings', icon: <Settings className="w-4 h-4" />, roles: ADMIN_ROLES },
     ],
   },
 ]

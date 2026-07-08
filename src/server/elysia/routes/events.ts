@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
-import { authGuard, adminGuard } from '../middleware/rbac'
+import { contentGuard } from '../middleware/rbac'
 
 export const eventRoutes = new Elysia({ prefix: '/events' })
   .get('/', async ({ query }) => {
@@ -88,8 +88,7 @@ export const eventRoutes = new Elysia({ prefix: '/events' })
     // TODO: Create EventRegistration record when model is added
     return { success: true, message: 'Registration submitted' }
   })
-  .use(authGuard)
-  .use(adminGuard)
+  .use(contentGuard)
   .post(
     '/',
     async ({ body }) => {

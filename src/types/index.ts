@@ -1,4 +1,6 @@
-export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'MEMBER'
+import type { UserRole } from '@/lib/roles'
+
+export type Role = UserRole
 
 export interface User {
   id: string

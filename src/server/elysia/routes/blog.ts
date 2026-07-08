@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
-import { authGuard, adminGuard } from '../middleware/rbac'
+import { contentGuard } from '../middleware/rbac'
 
 export const blogRoutes = new Elysia({ prefix: '/blog' })
   .get('/', async ({ query }) => {
@@ -88,8 +88,7 @@ export const blogRoutes = new Elysia({ prefix: '/blog' })
     }
     return { success: true, data: post }
   })
-  .use(authGuard)
-  .use(adminGuard)
+  .use(contentGuard)
   .post(
     '/',
     async ({ body }) => {

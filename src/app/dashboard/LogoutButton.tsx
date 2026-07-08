@@ -3,13 +3,14 @@
 import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
 import { useAuthStore } from '@/store/auth-store'
+import { logoutRequest } from '@/lib/api-client'
 
 export default function LogoutButton() {
   const { logout } = useAuthStore()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutRequest()
     logout()
-    document.cookie = 'auth-token=; path=/; max-age=0'
     window.location.href = '/'
   }
 

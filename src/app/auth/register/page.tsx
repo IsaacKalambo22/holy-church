@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/store/auth-store'
+import { isStaff } from '@/lib/roles'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -58,8 +59,9 @@ export default function RegisterPage() {
       const loginData = await loginRes.json()
 
       if (loginData.success) {
-        login(loginData.data.user, loginData.data.token)
-        router.push('/dashboard')
+        login(loginData.data.user)
+        // New sign-ups are members; only staff have a dashboard.
+        router.push(isStaff(loginData.data.user.role) ? '/dashboard' : '/')
       } else {
         router.push('/auth/login')
       }
@@ -78,7 +80,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="flex items-center gap-3 p-4 rounded-lg bg-destructive/10 text-destructive">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm">{error}</p>
             </div>
           )}

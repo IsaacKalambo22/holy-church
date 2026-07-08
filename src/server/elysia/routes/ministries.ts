@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
-import { authGuard, adminGuard } from '../middleware/rbac'
+import { contentGuard } from '../middleware/rbac'
 
 export const ministryRoutes = new Elysia({ prefix: '/ministries' })
   .get('/', async ({ query }) => {
@@ -92,8 +92,7 @@ export const ministryRoutes = new Elysia({ prefix: '/ministries' })
     // TODO: Create Volunteer record when model is added
     return { success: true, message: 'Volunteer signup submitted' }
   })
-  .use(authGuard)
-  .use(adminGuard)
+  .use(contentGuard)
   .post(
     '/',
     async ({ body }) => {

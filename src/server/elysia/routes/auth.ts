@@ -5,6 +5,7 @@ import { randomBytes } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { env } from '@/lib/env'
 import { sendEmail } from '@/lib/email'
+import { buildAuthCookie, buildClearAuthCookie, getTokenFromHeaders } from '@/lib/auth-cookie'
 
 const jwtPlugin = jwt({
   name: 'jwt',
@@ -56,19 +57,20 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         set.status = 401
         return { success: false, error: 'Invalid credentials' }
       }
-      const token = await jwt.sign({ 
-        userId: user.id, 
-        email: user.email, 
-        name: user.name, 
-        role: user.role, 
+      const token = await jwt.sign({
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
         avatar: user.avatar,
-        isVerified: user.isVerified 
+        isVerified: user.isVerified
       })
       await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } })
+      // Store the JWT in an HttpOnly cookie instead of returning it to JS.
+      set.headers['Set-Cookie'] = buildAuthCookie(token)
       return {
         success: true,
         data: {
-          token,
           user: { id: user.id, email: user.email, name: user.name, role: user.role, avatar: user.avatar },
         },
       }
@@ -145,13 +147,17 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       }),
     }
   )
+  .post('/logout', ({ set }) => {
+    set.headers['Set-Cookie'] = buildClearAuthCookie()
+    return { success: true, message: 'Logged out' }
+  })
   .get('/me', async ({ headers, jwt, set }) => {
-    const auth = headers.authorization
-    if (!auth?.startsWith('Bearer ')) {
+    const token = getTokenFromHeaders(headers)
+    if (!token) {
       set.status = 401
       return { success: false, error: 'Unauthorized' }
     }
-    const payload = await jwt.verify(auth.slice(7))
+    const payload = await jwt.verify(token)
     if (!payload) {
       set.status = 401
       return { success: false, error: 'Invalid token' }

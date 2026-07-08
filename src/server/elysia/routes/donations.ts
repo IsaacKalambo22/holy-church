@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
-import { authGuard, adminGuard } from '../middleware/rbac'
+import { financeGuard } from '../middleware/rbac'
 
 export const donationRoutes = new Elysia({ prefix: '/donations' })
   .get('/', async ({ query }) => {
@@ -127,8 +127,7 @@ export const donationRoutes = new Elysia({ prefix: '/donations' })
       }),
     }
   )
-  .use(authGuard)
-  .use(adminGuard)
+  .use(financeGuard)
   .put(
     '/:id',
     async ({ params, body, set }) => {

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
-import { requireAuth } from '@/lib/auth-middleware'
+import { getSession } from '@/lib/auth-middleware'
+import { isStaff } from '@/lib/roles'
 import { DashboardLayout as DashboardShell } from '@/components/dashboard/DashboardLayout'
 
 export default async function DashboardLayout({
@@ -7,14 +8,19 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  try {
-    await requireAuth()
-  } catch {
+  const session = await getSession()
+
+  // Not signed in → login. Signed-in plain members have no dashboard yet, so
+  // they are sent back to the public site (only staff manage things here).
+  if (!session) {
     redirect('/auth/login')
+  }
+  if (!isStaff(session.user.role)) {
+    redirect('/')
   }
 
   return (
-    <DashboardShell title="Dashboard" subtitle="Welcome to your member dashboard">
+    <DashboardShell title="Dashboard" subtitle="Manage your church">
       {children}
     </DashboardShell>
   )

@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers'
 import { env } from './env'
 import { jwtVerify } from 'jose'
+import type { UserRole } from './roles'
 
-export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'MEMBER'
+export type { UserRole }
 
 export interface AuthUser {
   id: string
@@ -60,9 +61,4 @@ export async function requireRole(allowedRoles: UserRole[]): Promise<AuthSession
   return session
 }
 
-export function hasRole(user: AuthUser, role: UserRole): boolean {
-  if (user.role === 'SUPER_ADMIN') return true
-  if (role === 'ADMIN' && user.role === 'ADMIN') return true
-  if (role === 'MEMBER') return true
-  return false
-}
+// Role checks live in '@/lib/roles' (isAdmin, isFinance, isStaff, …) — use those.

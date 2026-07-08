@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
-import { authGuard, adminGuard } from '../middleware/rbac'
+import { contentGuard } from '../middleware/rbac'
 
 export const prayerRoutes = new Elysia({ prefix: '/prayer' })
   .get('/', async ({ query }) => {
@@ -76,8 +76,7 @@ export const prayerRoutes = new Elysia({ prefix: '/prayer' })
       }),
     }
   )
-  .use(authGuard)
-  .use(adminGuard)
+  .use(contentGuard)
   .put(
     '/:id',
     async ({ params, body, set }) => {

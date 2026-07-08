@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia'
 import { prisma } from '@/lib/prisma'
-import { authGuard, adminGuard } from '../middleware/rbac'
+import { contentGuard } from '../middleware/rbac'
 
 export const galleryRoutes = new Elysia({ prefix: '/gallery' })
   // Legacy Gallery routes (backward compatibility)
@@ -30,8 +30,7 @@ export const galleryRoutes = new Elysia({ prefix: '/gallery' })
     }
     return { success: true, data: item }
   })
-  .use(authGuard)
-  .use(adminGuard)
+  .use(contentGuard)
   .post(
     '/',
     async ({ body }) => {
