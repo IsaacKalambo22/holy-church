@@ -17,9 +17,9 @@ const fields: Field[] = [
   { name: 'series', label: 'Series' },
   { name: 'description', label: 'Description', type: 'textarea' },
   { name: 'date', label: 'Date', type: 'date' },
-  { name: 'videoUrl', label: 'Video URL' },
-  { name: 'audioUrl', label: 'Audio URL' },
-  { name: 'thumbnailUrl', label: 'Thumbnail URL' },
+  { name: 'thumbnailUrl', label: 'Thumbnail', type: 'image' },
+  { name: 'videoUrl', label: 'Video', type: 'video' },
+  { name: 'audioUrl', label: 'Audio', type: 'audio' },
   { name: 'published', label: 'Published', type: 'checkbox' },
 ]
 

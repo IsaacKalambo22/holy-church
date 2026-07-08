@@ -6,18 +6,157 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Pencil, Trash2, X, Loader2, Inbox } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Loader2, Inbox, Upload, Film } from 'lucide-react'
 
 export type Item = Record<string, unknown>
 
 export interface Field {
   name: string
   label: string
-  type?: 'text' | 'textarea' | 'number' | 'checkbox' | 'date' | 'select' | 'stringlist'
+  type?:
+    | 'text'
+    | 'textarea'
+    | 'number'
+    | 'checkbox'
+    | 'date'
+    | 'select'
+    | 'stringlist'
+    | 'image'
+    | 'video'
+    | 'audio'
+    | 'imagelist'
   options?: { value: string; label: string }[]
   required?: boolean
   placeholder?: string
   help?: string
+}
+
+async function uploadFile(file: File): Promise<string> {
+  const fd = new FormData()
+  fd.append('file', file)
+  const res = await apiFetch('/api/upload', { method: 'POST', body: fd })
+  const json = await res.json().catch(() => ({ success: false }))
+  if (!res.ok || !json.success) throw new Error(json.error || 'Upload failed')
+  return json.data.url as string
+}
+
+const acceptFor = (type?: string) =>
+  type === 'video' ? 'video/*' : type === 'audio' ? 'audio/*' : 'image/*'
+
+function FileField({
+  type,
+  value,
+  onChange,
+}: {
+  type: 'image' | 'video' | 'audio'
+  value: string
+  onChange: (url: string) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+
+  const handle = async (file?: File) => {
+    if (!file) return
+    setBusy(true)
+    setErr('')
+    try {
+      onChange(await uploadFile(file))
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Upload failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      {value && type === 'image' && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={value} alt="preview" className="h-28 w-full rounded-lg border border-border object-cover" />
+      )}
+      {value && type !== 'image' && (
+        <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground">
+          <Film className="h-4 w-4" />
+          <a href={value} target="_blank" rel="noreferrer" className="truncate text-primary hover:underline">
+            {value.split('/').pop()}
+          </a>
+        </div>
+      )}
+      <div className="flex items-center gap-2">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm hover:bg-accent">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {busy ? 'Uploading…' : value ? 'Replace' : `Upload ${type}`}
+          <input
+            type="file"
+            accept={acceptFor(type)}
+            className="hidden"
+            disabled={busy}
+            onChange={(e) => handle(e.target.files?.[0])}
+          />
+        </label>
+        {value && !busy && (
+          <button type="button" onClick={() => onChange('')} className="text-sm text-muted-foreground hover:text-destructive">
+            Remove
+          </button>
+        )}
+      </div>
+      {err && <p className="text-xs text-destructive">{err}</p>}
+    </div>
+  )
+}
+
+function MultiImageField({
+  value,
+  onChange,
+}: {
+  value: string[]
+  onChange: (urls: string[]) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+
+  const handle = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    setBusy(true)
+    setErr('')
+    try {
+      const urls = await Promise.all(Array.from(files).map((f) => uploadFile(f)))
+      onChange([...value, ...urls])
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Upload failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      {value.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {value.map((url, i) => (
+            <div key={url + i} className="group relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={url} alt="" className="h-20 w-full rounded-lg border border-border object-cover" />
+              <button
+                type="button"
+                onClick={() => onChange(value.filter((_, idx) => idx !== i))}
+                className="absolute -right-1.5 -top-1.5 rounded-full bg-destructive p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                aria-label="Remove"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm hover:bg-accent">
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+        {busy ? 'Uploading…' : 'Add images'}
+        <input type="file" accept="image/*" multiple className="hidden" disabled={busy} onChange={(e) => handle(e.target.files)} />
+      </label>
+      {err && <p className="text-xs text-destructive">{err}</p>}
+    </div>
+  )
 }
 
 export interface Column {
@@ -88,7 +227,7 @@ export function ResourceManager({
   const openCreate = () => {
     const initial: Record<string, unknown> = {}
     fields.forEach((f) => {
-      initial[f.name] = f.type === 'checkbox' ? false : ''
+      initial[f.name] = f.type === 'checkbox' ? false : f.type === 'imagelist' ? [] : ''
     })
     setForm(initial)
     setEditing(null)
@@ -103,6 +242,7 @@ export function ResourceManager({
       if (f.type === 'checkbox') initial[f.name] = Boolean(v)
       else if (f.type === 'date') initial[f.name] = toDateInput(v)
       else if (f.type === 'stringlist') initial[f.name] = Array.isArray(v) ? v.join('\n') : ''
+      else if (f.type === 'imagelist') initial[f.name] = Array.isArray(v) ? v : []
       else initial[f.name] = v ?? ''
     })
     setForm(initial)
@@ -116,7 +256,7 @@ export function ResourceManager({
     for (const f of fields) {
       if (f.required) {
         const v = form[f.name]
-        if (v === '' || v === undefined || v === null) {
+        if (v === '' || v === undefined || v === null || (Array.isArray(v) && v.length === 0)) {
           setFormError(`${f.label} is required`)
           return
         }
@@ -136,6 +276,8 @@ export function ResourceManager({
           .split(/[\n,]/)
           .map((s) => s.trim())
           .filter(Boolean)
+      } else if (f.type === 'imagelist') {
+        v = Array.isArray(v) ? v : []
       }
       // Skip empty optional strings so we don't overwrite with ""
       if (!f.required && (v === '' || v === undefined)) continue
@@ -339,6 +481,17 @@ export function ResourceManager({
                       />
                       <span className="text-sm text-foreground">{f.label}</span>
                     </label>
+                  ) : f.type === 'image' || f.type === 'video' || f.type === 'audio' ? (
+                    <FileField
+                      type={f.type}
+                      value={String(form[f.name] ?? '')}
+                      onChange={(url) => setForm((s) => ({ ...s, [f.name]: url }))}
+                    />
+                  ) : f.type === 'imagelist' ? (
+                    <MultiImageField
+                      value={Array.isArray(form[f.name]) ? (form[f.name] as string[]) : []}
+                      onChange={(urls) => setForm((s) => ({ ...s, [f.name]: urls }))}
+                    />
                   ) : (
                     <Input
                       id={f.name}

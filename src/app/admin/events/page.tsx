@@ -32,7 +32,7 @@ const fields: Field[] = [
   { name: 'location', label: 'Location' },
   { name: 'category', label: 'Category' },
   { name: 'capacity', label: 'Capacity', type: 'number' },
-  { name: 'imageUrl', label: 'Image URL' },
+  { name: 'imageUrl', label: 'Image', type: 'image' },
   {
     name: 'status',
     label: 'Status',

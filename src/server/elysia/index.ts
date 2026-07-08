@@ -17,6 +17,7 @@ import { memberRoutes } from './routes/member'
 import { adminRoutes } from './routes/admin'
 import { notificationRoutes } from './routes/notifications'
 import { searchRoutes } from './routes/search'
+import { uploadRoutes } from './routes/upload'
 
 export const app = new Elysia({ prefix: '/api' })
   .use(errorHandler)
@@ -49,3 +50,4 @@ export const app = new Elysia({ prefix: '/api' })
   .use(adminRoutes)
   .use(notificationRoutes)
   .use(searchRoutes)
+  .use(uploadRoutes)

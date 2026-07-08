@@ -15,7 +15,7 @@ const columns: Column[] = [
 
 const fields: Field[] = [
   { name: 'caption', label: 'Caption', required: true },
-  { name: 'imageUrls', label: 'Image URLs', type: 'stringlist', required: true, help: 'One image URL per line' },
+  { name: 'imageUrls', label: 'Images', type: 'imagelist', required: true, help: 'Upload one or more photos' },
 ]
 
 export default function AdminGalleryPage() {

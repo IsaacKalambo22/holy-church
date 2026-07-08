@@ -15,7 +15,7 @@ const fields: Field[] = [
   { name: 'slug', label: 'Slug', help: 'Auto-generated from title if left blank' },
   { name: 'excerpt', label: 'Excerpt', type: 'textarea' },
   { name: 'content', label: 'Content', type: 'textarea' },
-  { name: 'thumbnailUrl', label: 'Thumbnail URL' },
+  { name: 'thumbnailUrl', label: 'Thumbnail', type: 'image' },
   {
     name: 'status',
     label: 'Status',
