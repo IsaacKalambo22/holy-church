@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ChevronDown, Sun, Moon, User, LogOut } from 'lucide-react'
@@ -52,10 +53,15 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center glow-purple group-hover:scale-105 transition-transform">
-              <span className="text-white font-bold text-sm">HC</span>
-            </div>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <Image
+              src="/logo.png"
+              alt="Holy Church Assembly"
+              width={40}
+              height={40}
+              priority
+              className="h-10 w-10 object-contain transition-transform group-hover:scale-105"
+            />
             <span className="font-heading font-bold text-lg text-foreground">
               Holy Church
             </span>

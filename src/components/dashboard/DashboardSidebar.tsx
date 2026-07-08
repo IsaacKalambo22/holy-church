@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
@@ -130,9 +131,13 @@ export function DashboardSidebar() {
         {/* Brand */}
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-5">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-brand">
-              <span className="text-sm font-bold text-white">HC</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Holy Church Assembly"
+              width={36}
+              height={36}
+              className="h-9 w-9 object-contain"
+            />
             <div className="leading-tight">
               <p className="text-sm font-bold text-foreground">Holy Church</p>
               <p className="text-[11px] text-muted-foreground">Management</p>
