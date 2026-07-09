@@ -32,7 +32,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--brand-indigo)] text-white">
+    <footer className="bg-brand-indigo text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
           {/* Brand */}
@@ -93,15 +93,15 @@ export function Footer() {
         {/* Contact row */}
         <div className="flex flex-col md:flex-row gap-4 py-8 border-b border-white/10 text-sm text-white/60">
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-[var(--brand-orange)] flex-shrink-0" />
+            <MapPin className="w-4 h-4 text-brand-orange shrink-0" />
             123 Faith Avenue, Lilongwe, Malawi
           </div>
           <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-[var(--brand-orange)] flex-shrink-0" />
+            <Phone className="w-4 h-4 text-brand-orange shrink-0" />
             +265 999 000 000
           </div>
           <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-[var(--brand-orange)] flex-shrink-0" />
+            <Mail className="w-4 h-4 text-brand-orange shrink-0" />
             hello@holychurch.mw
           </div>
         </div>

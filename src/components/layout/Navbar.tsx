@@ -63,7 +63,7 @@ export function Navbar() {
               className="h-10 w-10 object-contain transition-transform group-hover:scale-105"
             />
             <span className="font-heading font-bold text-lg text-foreground">
-              Holy Church
+              Holy Church Assembly
             </span>
           </Link>
 

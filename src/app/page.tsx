@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { WelcomeSection } from '@/components/sections/WelcomeSection'
 import { ServiceTimesSection } from '@/components/sections/ServiceTimesSection'
@@ -29,18 +30,39 @@ export const metadata: Metadata = {
   },
 }
 
-export default function HomePage() {
+async function fetchList(path: string) {
+  try {
+    const headersList = await headers()
+    const host = headersList.get('host') || 'localhost:3000'
+    const protocol = headersList.get('x-forwarded-proto') || 'http'
+    const res = await fetch(`${protocol}://${host}${path}`, { next: { revalidate: 300 } })
+    if (!res.ok) return []
+    const json = await res.json()
+    return json.success && Array.isArray(json.data) ? json.data : []
+  } catch {
+    return []
+  }
+}
+
+export default async function HomePage() {
+  const [sermons, ministries, events, galleries] = await Promise.all([
+    fetchList('/api/sermons?limit=3&published=true'),
+    fetchList('/api/ministries?limit=6&status=ACTIVE'),
+    fetchList('/api/events?limit=4'),
+    fetchList('/api/gallery?limit=3'),
+  ])
+
   return (
     <>
       <HeroSection />
       <WelcomeSection />
       <ServiceTimesSection />
-      <SermonsSection />
+      <SermonsSection sermons={sermons} />
       <ChurchStatsSection />
-      <MinistriesSection />
-      <EventsSection />
+      <MinistriesSection ministries={ministries} />
+      <EventsSection events={events} />
       <PrayerCTASection />
-      <GallerySection />
+      <GallerySection galleries={galleries} />
       <GivingSection />
       <TestimonialsSection />
       <ContactSection />

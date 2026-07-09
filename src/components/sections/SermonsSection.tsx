@@ -2,18 +2,28 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Play, Clock, ArrowRight } from 'lucide-react'
+import { Play, ArrowRight, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
-const sermons = [
-  { title: 'Walking in the Fullness of God', preacher: 'Pastor John Banda', series: 'Faith Series', duration: '48 min', date: 'Jun 15, 2026', thumbnail: null },
-  { title: 'The Power of the Resurrection', preacher: 'Elder Grace Phiri', series: 'Easter Series', duration: '41 min', date: 'Jun 8, 2026', thumbnail: null },
-  { title: 'Finding Purpose in Chaos', preacher: 'Pastor John Banda', series: 'Life Series', duration: '52 min', date: 'Jun 1, 2026', thumbnail: null },
-]
+interface SermonItem {
+  id: string
+  slug?: string | null
+  title: string
+  series?: string | null
+  thumbnailUrl?: string | null
+  date?: string | null
+  preacher?: { name: string } | null
+}
 
-export function SermonsSection() {
+function fmt(date?: string | null) {
+  if (!date) return ''
+  const d = new Date(date)
+  return isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+export function SermonsSection({ sermons = [] }: { sermons?: SermonItem[] }) {
   return (
     <section className="py-24 px-4 bg-muted/40">
       <div className="max-w-7xl mx-auto">
@@ -37,51 +47,65 @@ export function SermonsSection() {
           </Button>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {sermons.map((sermon, i) => (
-            <motion.div
-              key={sermon.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <Card className="group overflow-hidden cursor-pointer h-full">
-                {/* Thumbnail */}
-                <div className="relative h-52 gradient-hero overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center"
-                    >
-                      <Play className="w-7 h-7 text-white ml-1" />
-                    </motion.div>
-                  </div>
-                  <div className="absolute bottom-3 left-3">
-                    <Badge className="bg-[var(--brand-orange)] text-white border-0 text-xs">
-                      {sermon.series}
-                    </Badge>
-                  </div>
-                </div>
-
-                <CardContent className="pt-5">
-                  <h3 className="font-heading font-semibold text-foreground text-lg leading-snug mb-2 group-hover:text-primary transition-colors">
-                    {sermon.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-3">{sermon.preacher}</p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      {sermon.duration}
+        {sermons.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {sermons.map((sermon, i) => (
+              <motion.div
+                key={sermon.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Link href={sermon.slug ? `/sermons/${sermon.slug}` : '/sermons'}>
+                  <Card className="group overflow-hidden cursor-pointer h-full">
+                    <div className="relative h-52 gradient-hero overflow-hidden">
+                      {sermon.thumbnailUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={sermon.thumbnailUrl}
+                          alt={sermon.title}
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                      )}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center transition-transform group-hover:scale-110">
+                          <Play className="w-7 h-7 text-white ml-1" />
+                        </div>
+                      </div>
+                      {sermon.series && (
+                        <div className="absolute bottom-3 left-3">
+                          <Badge className="bg-brand-orange text-white border-0 text-xs">{sermon.series}</Badge>
+                        </div>
+                      )}
                     </div>
-                    <span>{sermon.date}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                    <CardContent className="pt-5">
+                      <h3 className="font-heading font-semibold text-foreground text-lg leading-snug mb-2 group-hover:text-primary transition-colors">
+                        {sermon.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">{sermon.preacher?.name || 'Holy Church Assembly'}</p>
+                      <div className="flex items-center justify-end text-xs text-muted-foreground">
+                        <span>{fmt(sermon.date)}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <EmptySection icon={<BookOpen className="h-7 w-7" />} text="No sermons have been published yet. Check back soon." />
+        )}
       </div>
     </section>
+  )
+}
+
+function EmptySection({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-background/50 py-16 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted text-muted-foreground">{icon}</div>
+      <p className="max-w-sm text-muted-foreground">{text}</p>
+    </div>
   )
 }

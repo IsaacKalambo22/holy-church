@@ -17,15 +17,14 @@ export function WelcomeSection() {
             transition={{ duration: 0.7 }}
             className="relative"
           >
-            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-br from-primary/20 to-secondary/20 border border-border">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <div className="w-24 h-24 rounded-full bg-primary/20 mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-4xl">🙏</span>
-                  </div>
-                  <p className="text-sm font-medium">Pastor Photo</p>
-                </div>
-              </div>
+            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] border border-border shadow-xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/Pastor2.jpeg"
+                alt="Senior Pastor, Holy Church Assembly"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
             </div>
             {/* Decorative card */}
             <div className="absolute -bottom-6 -right-6 bg-card border border-border rounded-2xl p-5 shadow-xl max-w-[220px]">

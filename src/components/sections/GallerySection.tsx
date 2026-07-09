@@ -2,26 +2,21 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const gradients = [
-  'from-purple-500 to-indigo-600',
-  'from-orange-400 to-rose-500',
-  'from-indigo-600 to-purple-700',
-  'from-violet-500 to-purple-600',
-  'from-rose-400 to-orange-500',
-  'from-purple-600 to-violet-700',
-  'from-blue-500 to-indigo-600',
-  'from-orange-500 to-amber-400',
-]
+interface GalleryItem {
+  id: string
+  caption: string
+  imageUrls: string[]
+}
 
-const labels = [
-  'Sunday Worship', 'Community Outreach', 'Youth Night', 'Bible Study',
-  'Church Convention', 'Missions Trip', "Children's Day", 'Baptism Service',
-]
+export function GallerySection({ galleries = [] }: { galleries?: GalleryItem[] }) {
+  // Flatten the most recent galleries into individual photos (max 8).
+  const photos = galleries
+    .flatMap((g) => (g.imageUrls || []).map((url) => ({ url, caption: g.caption })))
+    .slice(0, 8)
 
-export function GallerySection() {
   return (
     <section className="py-24 px-4 bg-muted/30">
       <div className="max-w-7xl mx-auto">
@@ -42,25 +37,42 @@ export function GallerySection() {
           </Button>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {gradients.map((gradient, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.06 }}
-              className={`relative aspect-square rounded-xl bg-gradient-to-br ${gradient} overflow-hidden group cursor-pointer`}
-            >
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute inset-0 flex items-end p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-white text-xs font-medium bg-black/40 backdrop-blur-sm px-2 py-1 rounded-lg">
-                  {labels[i]}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {photos.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {photos.map((photo, i) => (
+              <motion.div
+                key={photo.url + i}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photo.url}
+                  alt={photo.caption || ''}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                {photo.caption && (
+                  <div className="absolute inset-0 flex items-end p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-xs font-medium bg-black/40 backdrop-blur-sm px-2 py-1 rounded-lg">
+                      {photo.caption}
+                    </span>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-background/50 py-16 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
+              <ImageIcon className="h-7 w-7" />
+            </div>
+            <p className="max-w-sm text-muted-foreground">Photos from our life together will appear here soon.</p>
+          </div>
+        )}
       </div>
     </section>
   )
