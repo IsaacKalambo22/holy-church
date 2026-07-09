@@ -139,7 +139,7 @@ export function DashboardSidebar() {
               className="h-9 w-9 object-contain"
             />
             <div className="leading-tight">
-              <p className="text-sm font-bold text-foreground">Holy Church</p>
+              <p className="text-sm font-bold text-foreground">Holy Church Assembly</p>
               <p className="text-[11px] text-muted-foreground">Management</p>
             </div>
           </Link>

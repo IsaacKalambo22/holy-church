@@ -60,8 +60,9 @@ async function getRelatedMinistries(category?: string) {
   return result.data.slice(0, 3)
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const ministry = await getMinistry(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const ministry = await getMinistry(slug)
   
   if (!ministry) {
     return {
@@ -81,8 +82,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function MinistryDetailsPage({ params }: { params: { slug: string } }) {
-  const ministry = await getMinistry(params.slug)
+export default async function MinistryDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const ministry = await getMinistry(slug)
   
   if (!ministry) {
     notFound()
@@ -102,7 +104,7 @@ export default async function MinistryDetailsPage({ params }: { params: { slug: 
             alt={ministry.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
             <Link href="/ministries" className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -110,7 +112,7 @@ export default async function MinistryDetailsPage({ params }: { params: { slug: 
             </Link>
             <div className="flex items-center gap-3 mb-3">
               {ministry.category && (
-                <Badge className="bg-[var(--brand-orange)] border-0 text-white">{ministry.category}</Badge>
+                <Badge className="bg-brand-orange border-0 text-white">{ministry.category}</Badge>
               )}
               <Badge variant={isActive ? 'default' : 'secondary'}>
                 {isActive ? 'Active' : 'Inactive'}
@@ -128,7 +130,7 @@ export default async function MinistryDetailsPage({ params }: { params: { slug: 
             </Link>
             <div className="flex items-center gap-3 mb-3">
               {ministry.category && (
-                <Badge className="bg-[var(--brand-orange)] border-0 text-white">{ministry.category}</Badge>
+                <Badge className="bg-brand-orange border-0 text-white">{ministry.category}</Badge>
               )}
               <Badge variant={isActive ? 'default' : 'secondary'}>
                 {isActive ? 'Active' : 'Inactive'}
@@ -201,7 +203,7 @@ export default async function MinistryDetailsPage({ params }: { params: { slug: 
               <Card>
                 <CardContent className="p-6">
                   <h3 className="font-heading font-bold text-foreground mb-4">Category</h3>
-                  <Badge className="bg-[var(--brand-orange)] border-0 text-white">{ministry.category}</Badge>
+                  <Badge className="bg-brand-orange border-0 text-white">{ministry.category}</Badge>
                 </CardContent>
               </Card>
             )}
