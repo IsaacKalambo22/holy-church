@@ -20,8 +20,8 @@ export function HeroSection() {
       </div>
 
       {/* Glow orbs */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[var(--brand-purple)] rounded-full blur-[120px] opacity-20 pointer-events-none" />
-      <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-[var(--brand-orange)] rounded-full blur-[100px] opacity-15 pointer-events-none" />
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-brand-purple rounded-full blur-[120px] opacity-20 pointer-events-none" />
+      <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-brand-orange rounded-full blur-[100px] opacity-15 pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="max-w-4xl">
@@ -32,7 +32,7 @@ export function HeroSection() {
             className="mb-6"
           >
             <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-medium px-4 py-1.5 rounded-full">
-              <span className="w-2 h-2 bg-[var(--brand-orange)] rounded-full animate-pulse" />
+              <span className="w-2 h-2 bg-brand-orange rounded-full animate-pulse" />
               Sunday Service — 9:00 AM & 11:00 AM
             </span>
           </motion.div>
@@ -101,7 +101,7 @@ export function HeroSection() {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-background to-transparent" />
     </section>
   )
 }

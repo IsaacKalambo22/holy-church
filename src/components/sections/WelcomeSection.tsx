@@ -17,7 +17,7 @@ export function WelcomeSection() {
             transition={{ duration: 0.7 }}
             className="relative"
           >
-            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] border border-border shadow-xl">
+            <div className="relative rounded-2xl overflow-hidden aspect-4/5 border border-border shadow-xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/Pastor2.jpeg"
@@ -27,7 +27,7 @@ export function WelcomeSection() {
               <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
             </div>
             {/* Decorative card */}
-            <div className="absolute -bottom-6 -right-6 bg-card border border-border rounded-2xl p-5 shadow-xl max-w-[220px]">
+            <div className="absolute -bottom-6 -right-6 bg-card border border-border rounded-2xl p-5 shadow-xl max-w-55">
               <div className="w-10 h-10 rounded-full gradient-brand flex items-center justify-center mb-3">
                 <span className="text-white text-lg">✦</span>
               </div>
