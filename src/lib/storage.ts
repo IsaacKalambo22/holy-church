@@ -2,14 +2,14 @@ import { createClient } from '@supabase/supabase-js'
 
 function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabaseKey) {
     console.error('Supabase credentials are not set')
     return null
   }
 
-  return createClient(supabaseUrl, supabaseAnonKey)
+  return createClient(supabaseUrl, supabaseKey)
 }
 
 const BUCKET_NAME = process.env.BUCKET_NAME || 'holy-church'
@@ -32,7 +32,10 @@ export async function uploadToSupabase(
     })
 
   if (error) {
-    throw new Error(`Upload failed: ${error.message}`)
+    const hint = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? ''
+      : ' Set SUPABASE_SERVICE_ROLE_KEY for server-side uploads if this is still failing.'
+    throw new Error(`Upload failed: ${error.message}${hint}`)
   }
 
   const { data: { publicUrl } } = supabase.storage

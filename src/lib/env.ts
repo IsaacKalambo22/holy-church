@@ -6,6 +6,7 @@ const serverSchema = z.object({
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   BUCKET_NAME: z.string().default('holy-church'),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z.string().email().optional(),
 })
