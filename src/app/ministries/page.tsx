@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { MinistryCard } from '@/components/shared/MinistryCard'
+import { MINISTRY_CATEGORIES } from '@/lib/ministry-categories'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -63,7 +64,7 @@ export default async function MinistriesPage({
   const resolvedSearchParams = await searchParams
   const { data: ministries, page, totalPages } = await getMinistries(resolvedSearchParams)
 
-  const categories = ['Worship', 'Youth', 'Children', 'Outreach', 'Missions', 'Care', 'Media', 'Prayer', 'Community']
+  const categories = MINISTRY_CATEGORIES
 
   return (
     <div className="min-h-screen bg-background">

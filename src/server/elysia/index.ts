@@ -12,6 +12,7 @@ import { blogRoutes } from './routes/blog'
 import { donationRoutes } from './routes/donations'
 import { galleryRoutes } from './routes/gallery'
 import { ministryRoutes } from './routes/ministries'
+import { courseRoutes, lessonRoutes } from './routes/courses'
 import { contactRoutes } from './routes/contact'
 import { memberRoutes } from './routes/member'
 import { adminRoutes } from './routes/admin'
@@ -45,6 +46,8 @@ export const app = new Elysia({ prefix: '/api' })
   .use(donationRoutes)
   .use(galleryRoutes)
   .use(ministryRoutes)
+  .use(courseRoutes)
+  .use(lessonRoutes)
   .use(contactRoutes)
   .use(memberRoutes)
   .use(adminRoutes)

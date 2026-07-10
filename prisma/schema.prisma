@@ -349,6 +349,45 @@ model Ministry {
   @@map("ministries")
 }
 
+model Course {
+  id          String    @id @default(uuid())
+  title       String
+  slug        String    @unique
+  description String?
+  category    String?   // Learning track/level, e.g. "Beginners", "Ministers"
+  imageUrl    String?
+  published   Boolean   @default(false)
+  lessons     Lesson[]
+  deletedAt   DateTime? @db.Timestamptz
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @db.Timestamptz
+
+  @@index([deletedAt])
+  @@index([slug])
+  @@index([category])
+  @@index([published])
+  @@map("courses")
+}
+
+model Lesson {
+  id          String    @id @default(uuid())
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    String
+  title       String
+  description String?
+  videoUrl    String?
+  order       Int       @default(0)
+  published   Boolean   @default(true)
+  deletedAt   DateTime? @db.Timestamptz
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @db.Timestamptz
+
+  @@index([courseId])
+  @@index([deletedAt])
+  @@index([courseId, order])
+  @@map("lessons")
+}
+
 model MemberPreference {
   id                          String   @id @default(uuid())
   userId                      String   @unique

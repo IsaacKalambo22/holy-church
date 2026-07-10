@@ -12,6 +12,8 @@ import {
   BookOpen,
   Heart,
   FileText,
+  GraduationCap,
+  PlaySquare,
   Image as ImageIcon,
   DollarSign,
   Bell,
@@ -60,6 +62,13 @@ const navigation: NavSection[] = [
     items: [
       { title: 'Blog', href: '/admin/blog', icon: <FileText className="w-[18px] h-[18px]" />, roles: CONTENT_ROLES },
       { title: 'Gallery & Media', href: '/admin/gallery', icon: <ImageIcon className="w-[18px] h-[18px]" />, roles: CONTENT_ROLES },
+    ],
+  },
+  {
+    title: 'Learning',
+    items: [
+      { title: 'Courses', href: '/admin/courses', icon: <GraduationCap className="w-[18px] h-[18px]" />, roles: CONTENT_ROLES },
+      { title: 'Lessons', href: '/admin/lessons', icon: <PlaySquare className="w-[18px] h-[18px]" />, roles: CONTENT_ROLES },
     ],
   },
   {

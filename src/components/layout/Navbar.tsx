@@ -25,6 +25,7 @@ const navLinks = [
     ],
   },
   { href: '/sermons', label: 'Sermons' },
+  { href: '/lessons', label: 'Lessons' },
   { href: '/events', label: 'Events' },
   { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },

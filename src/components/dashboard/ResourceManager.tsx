@@ -216,7 +216,7 @@ export interface Column {
 }
 
 interface Props {
-  /** API base, e.g. "/api/sermons" */
+  /** API base, e.g. "/api/sermons" — must be query-free; use listParams for GET filters */
   endpoint: string
   /** Singular noun, e.g. "Sermon" */
   title: string
@@ -227,6 +227,8 @@ interface Props {
   canEdit?: boolean
   canDelete?: boolean
   idField?: string
+  /** Extra query params applied to the list GET only (not to create/update/delete). */
+  listParams?: Record<string, string>
 }
 
 function toDateInput(value: unknown): string {
@@ -245,6 +247,7 @@ export function ResourceManager({
   canEdit = true,
   canDelete = true,
   idField = 'id',
+  listParams,
 }: Props) {
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
@@ -255,11 +258,15 @@ export function ResourceManager({
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
 
+  // Stable key so a fresh listParams object literal each render doesn't reload.
+  const listKey = JSON.stringify(listParams || {})
+
   const load = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
-      const res = await apiFetch(`${endpoint}?limit=100`)
+      const params = new URLSearchParams({ limit: '100', ...(JSON.parse(listKey) as Record<string, string>) })
+      const res = await apiFetch(`${endpoint}?${params.toString()}`)
       const json = await res.json()
       if (json.success) setItems(json.data || [])
       else setError(json.error || 'Failed to load')
@@ -268,7 +275,7 @@ export function ResourceManager({
     } finally {
       setLoading(false)
     }
-  }, [endpoint])
+  }, [endpoint, listKey])
 
   useEffect(() => {
     load()

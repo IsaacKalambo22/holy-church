@@ -2,6 +2,7 @@
 
 import { ResourceManager, type Column, type Field } from '@/components/dashboard/ResourceManager'
 import { Pill } from '@/components/dashboard/cells'
+import { MINISTRY_CATEGORIES } from '@/lib/ministry-categories'
 
 const columns: Column[] = [
   { key: 'name', label: 'Name' },
@@ -18,7 +19,12 @@ const fields: Field[] = [
   { name: 'name', label: 'Name', required: true },
   { name: 'slug', label: 'Slug', required: true, help: 'URL-friendly identifier' },
   { name: 'description', label: 'Description', type: 'textarea' },
-  { name: 'category', label: 'Category' },
+  {
+    name: 'category',
+    label: 'Category',
+    type: 'select',
+    options: MINISTRY_CATEGORIES.map((c) => ({ value: c, label: c })),
+  },
   { name: 'meetingSchedule', label: 'Meeting Schedule', placeholder: 'e.g. Sundays 2pm' },
   { name: 'contactEmail', label: 'Contact Email' },
   { name: 'contactPhone', label: 'Contact Phone' },

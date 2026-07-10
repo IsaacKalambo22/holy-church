@@ -41,8 +41,13 @@ export default function LoginPage() {
       // client-side for display.
       login(data.data.user)
 
-      // Only staff have a dashboard; members return to the public site.
-      router.push(isStaff(data.data.user.role) ? '/dashboard' : '/')
+      // Honor a safe in-app ?redirect= target (e.g. a gated lessons page);
+      // otherwise staff land on the dashboard and members on the public site.
+      const redirectParam = new URLSearchParams(window.location.search).get('redirect')
+      const safeRedirect = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
+        ? redirectParam
+        : null
+      router.push(safeRedirect ?? (isStaff(data.data.user.role) ? '/dashboard' : '/'))
     } catch {
       setError('An error occurred. Please try again.')
     } finally {
