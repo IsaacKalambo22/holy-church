@@ -64,6 +64,7 @@ export const memberRoutes = new Elysia({ prefix: '/member' })
           email: user.email,
           avatar: user.avatar,
           role: user.role,
+          learningTrack: user.learningTrack,
         },
         upcomingEvents,
         recentPrayerRequests,
@@ -73,6 +74,78 @@ export const memberRoutes = new Elysia({ prefix: '/member' })
           total: totalDonations._sum.amount || 0,
           count: totalDonations._count,
         },
+      },
+    }
+  })
+  .get('/learning', async ({ jwt, headers, set }) => {
+    const userId = await getUserId(headers, jwt.verify)
+    if (!userId) {
+      set.status = 401
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, learningTrack: true },
+    })
+    if (!user) {
+      set.status = 404
+      return { success: false, error: 'User not found' }
+    }
+
+    const publishedCourse = { deletedAt: null, published: true } as const
+    const lessonCount = {
+      _count: { select: { lessons: { where: { deletedAt: null, published: true } } } },
+    } as const
+
+    const [trackCourses, otherCourses, latestSermons, latestPodcasts] = await Promise.all([
+      // Courses matched to the member's chosen track (empty when "just exploring").
+      user.learningTrack
+        ? prisma.course.findMany({
+            where: { ...publishedCourse, category: user.learningTrack },
+            orderBy: { createdAt: 'desc' },
+            take: 12,
+            include: lessonCount,
+          })
+        : Promise.resolve([]),
+      // Everything else, so a member can always keep exploring beyond their track.
+      prisma.course.findMany({
+        where: {
+          ...publishedCourse,
+          ...(user.learningTrack ? { NOT: { category: user.learningTrack } } : {}),
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 12,
+        include: lessonCount,
+      }),
+      prisma.sermon.findMany({
+        where: { deletedAt: null, published: true },
+        orderBy: { date: 'desc' },
+        take: 5,
+        select: {
+          id: true, title: true, slug: true, description: true,
+          thumbnailUrl: true, date: true, series: true, audioUrl: true, videoUrl: true,
+        },
+      }),
+      prisma.podcast.findMany({
+        where: { deletedAt: null, published: true },
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+        take: 5,
+        select: {
+          id: true, title: true, description: true,
+          thumbnailUrl: true, audioUrl: true, videoUrl: true, duration: true, publishedAt: true,
+        },
+      }),
+    ])
+
+    return {
+      success: true,
+      data: {
+        learningTrack: user.learningTrack,
+        trackCourses: trackCourses.map((c) => ({ ...c, lessonCount: c._count.lessons })),
+        otherCourses: otherCourses.map((c) => ({ ...c, lessonCount: c._count.lessons })),
+        latestSermons,
+        latestPodcasts,
       },
     }
   })

@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { getSession } from '@/lib/auth-middleware'
-import { isAdmin } from '@/lib/roles'
+import { isAdmin, isStaff } from '@/lib/roles'
+import { getLearningData } from '@/lib/member-learning'
+import { MemberLearningDashboard } from '@/components/dashboard/MemberLearningDashboard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Calendar,
@@ -93,8 +95,15 @@ export default async function DashboardPage() {
     )
   }
 
-  const data = await getDashboardData(session.token)
   const firstName = session.user.name?.split(' ')[0] || 'there'
+
+  // Plain members get a learning-focused dashboard; staff keep the management view.
+  if (!isStaff(session.user.role)) {
+    const learning = await getLearningData(session.token)
+    return <MemberLearningDashboard firstName={firstName} data={learning} />
+  }
+
+  const data = await getDashboardData(session.token)
   const admin = isAdmin(session.user.role)
 
   const totalGiven = data?.givingSummary?.total ?? 0

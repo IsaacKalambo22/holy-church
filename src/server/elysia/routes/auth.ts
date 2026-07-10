@@ -22,7 +22,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
   .post(
     '/register',
     async ({ body, set }) => {
-      const { email, password, name } = body
+      const { email, password, name, learningTrack } = body
       const existing = await prisma.user.findUnique({ where: { email } })
       if (existing) {
         set.status = 409
@@ -30,8 +30,8 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       }
       const hashed = await bcrypt.hash(password, 12)
       const user = await prisma.user.create({
-        data: { email, password: hashed, name, role: 'MEMBER' },
-        select: { id: true, email: true, name: true, role: true, createdAt: true },
+        data: { email, password: hashed, name, role: 'MEMBER', learningTrack: learningTrack || null },
+        select: { id: true, email: true, name: true, role: true, learningTrack: true, createdAt: true },
       })
       return { success: true, data: user }
     },
@@ -40,6 +40,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         email: t.String({ format: 'email' }),
         password: t.String({ minLength: 8 }),
         name: t.String({ minLength: 2 }),
+        learningTrack: t.Optional(t.String()),
       }),
     }
   )

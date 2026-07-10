@@ -14,6 +14,8 @@ import {
   FileText,
   GraduationCap,
   PlaySquare,
+  Sparkles,
+  Video,
   Image as ImageIcon,
   DollarSign,
   Bell,
@@ -45,6 +47,15 @@ const navigation: NavSection[] = [
     items: [
       { title: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard className="w-[18px] h-[18px]" /> },
       { title: 'My Activity', href: '/dashboard/activity', icon: <ScrollText className="w-[18px] h-[18px]" /> },
+    ],
+  },
+  {
+    title: 'My Learning',
+    items: [
+      { title: 'My Learning', href: '/dashboard/learning', icon: <GraduationCap className="w-[18px] h-[18px]" /> },
+      { title: 'Browse Courses', href: '/lessons', icon: <PlaySquare className="w-[18px] h-[18px]" /> },
+      { title: 'Sermons', href: '/sermons', icon: <Video className="w-[18px] h-[18px]" /> },
+      { title: 'Prayer Wall', href: '/prayer/wall', icon: <Sparkles className="w-[18px] h-[18px]" /> },
     ],
   },
   {

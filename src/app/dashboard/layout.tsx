@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth-middleware'
-import { isStaff } from '@/lib/roles'
 import { DashboardLayout as DashboardShell } from '@/components/dashboard/DashboardLayout'
 
 export default async function DashboardLayout({
@@ -10,13 +9,10 @@ export default async function DashboardLayout({
 }) {
   const session = await getSession()
 
-  // Not signed in → login. Signed-in plain members have no dashboard yet, so
-  // they are sent back to the public site (only staff manage things here).
+  // Any signed-in user gets a dashboard: members see a learning hub, staff see
+  // the management console. Individual /admin pages enforce their own role guards.
   if (!session) {
     redirect('/auth/login')
-  }
-  if (!isStaff(session.user.role)) {
-    redirect('/')
   }
 
   return <DashboardShell>{children}</DashboardShell>

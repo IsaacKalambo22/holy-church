@@ -29,6 +29,7 @@ model User {
   avatar                     String?
   about                      String?
   role                       Role      @default(MEMBER)
+  learningTrack              String?   // Member's chosen learning track (see LESSON_CATEGORIES); null = just exploring
   lastLogin                  DateTime  @default(now())
   isVerified                 Boolean   @default(false)
   resetPasswordToken         String?

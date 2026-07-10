@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/store/auth-store'
-import { isStaff } from '@/lib/roles'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -42,12 +41,13 @@ export default function LoginPage() {
       login(data.data.user)
 
       // Honor a safe in-app ?redirect= target (e.g. a gated lessons page);
-      // otherwise staff land on the dashboard and members on the public site.
+      // otherwise everyone lands on the dashboard (members get a learning hub,
+      // staff get the management console).
       const redirectParam = new URLSearchParams(window.location.search).get('redirect')
       const safeRedirect = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
         ? redirectParam
         : null
-      router.push(safeRedirect ?? (isStaff(data.data.user.role) ? '/dashboard' : '/'))
+      router.push(safeRedirect ?? '/dashboard')
     } catch {
       setError('An error occurred. Please try again.')
     } finally {
