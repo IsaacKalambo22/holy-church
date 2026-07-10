@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getVideoEmbed } from '@/lib/video'
+import { getVideoEmbed, getVideoThumbnail } from '@/lib/video'
 
 async function getSermon(slug: string) {
   const headersList = await headers()
@@ -48,9 +48,10 @@ async function getRelatedSermons(sermonId: string, series?: string) {
   return result.data.filter((s: { id: string }) => s.id !== sermonId).slice(0, 3)
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const sermon = await getSermon(params.slug)
-  
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const sermon = await getSermon(slug)
+
   if (!sermon) {
     return {
       title: 'Sermon Not Found',
@@ -69,9 +70,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function SermonDetailsPage({ params }: { params: { slug: string } }) {
-  const sermon = await getSermon(params.slug)
-  
+export default async function SermonDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const sermon = await getSermon(slug)
+
   if (!sermon) {
     notFound()
   }
@@ -255,11 +257,18 @@ export default async function SermonDetailsPage({ params }: { params: { slug: st
           <section className="mt-16">
             <h2 className="font-heading text-3xl font-bold text-foreground mb-8">Related Sermons</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedSermons.map((related: { id: string; slug: string; title: string; preacher?: { name: string } | null }) => (
+              {relatedSermons.map((related: { id: string; slug: string; title: string; preacher?: { name: string } | null; thumbnailUrl?: string | null; videoUrl?: string | null }) => {
+                const relatedPoster = related.thumbnailUrl || getVideoThumbnail(related.videoUrl)
+                return (
                 <Link key={related.id} href={`/sermons/${related.slug}`}>
                   <Card className="hover:shadow-md transition-all cursor-pointer">
-                    <div className="aspect-video bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-                      <Play className="w-12 h-12 text-white/80" />
+                    <div className="aspect-video bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center relative overflow-hidden">
+                      {relatedPoster ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={relatedPoster} alt={related.title} className="absolute inset-0 h-full w-full object-cover" />
+                      ) : (
+                        <Play className="w-12 h-12 text-white/80" />
+                      )}
                     </div>
                     <CardContent className="pt-4">
                       <h3 className="font-heading font-semibold text-foreground leading-snug mb-2 line-clamp-2">
@@ -269,7 +278,8 @@ export default async function SermonDetailsPage({ params }: { params: { slug: st
                     </CardContent>
                   </Card>
                 </Link>
-              ))}
+                )
+              })}
             </div>
           </section>
         )}

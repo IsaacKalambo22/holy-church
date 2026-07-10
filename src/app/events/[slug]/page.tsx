@@ -64,9 +64,10 @@ async function getRelatedEvents(category?: string) {
   return result.data.slice(0, 3)
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const event = await getEvent(params.slug)
-  
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const event = await getEvent(slug)
+
   if (!event) {
     return {
       title: 'Event Not Found',
@@ -85,9 +86,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function EventDetailsPage({ params }: { params: { slug: string } }) {
-  const event = await getEvent(params.slug)
-  
+export default async function EventDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const event = await getEvent(slug)
+
   if (!event) {
     notFound()
   }

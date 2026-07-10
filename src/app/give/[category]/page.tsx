@@ -12,8 +12,8 @@ const categoryLabels: Record<string, string> = {
   children: "Children's Ministry",
 }
 
-export async function generateMetadata({ params }: { params: { category: string } }): Promise<Metadata> {
-  const category = params.category
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
+  const { category } = await params
   const label = categoryLabels[category] || category
 
   return {
@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: { params: { category: string 
   }
 }
 
-export default function GiveCategoryPage({ params }: { params: { category: string } }) {
-  const category = params.category
+export default async function GiveCategoryPage({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params
 
   if (!categoryLabels[category]) {
     notFound()

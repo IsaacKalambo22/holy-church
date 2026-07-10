@@ -38,9 +38,10 @@ async function getAlbum(slug: string) {
   } | null
 }
 
-export async function generateMetadata({ params }: { params: { album: string } }): Promise<Metadata> {
-  const album = await getAlbum(params.album)
-  
+export async function generateMetadata({ params }: { params: Promise<{ album: string }> }): Promise<Metadata> {
+  const { album: albumSlug } = await params
+  const album = await getAlbum(albumSlug)
+
   if (!album) {
     return {
       title: 'Album Not Found',
@@ -59,9 +60,10 @@ export async function generateMetadata({ params }: { params: { album: string } }
   }
 }
 
-export default async function AlbumPage({ params }: { params: { album: string } }) {
-  const album = await getAlbum(params.album)
-  
+export default async function AlbumPage({ params }: { params: Promise<{ album: string }> }) {
+  const { album: albumSlug } = await params
+  const album = await getAlbum(albumSlug)
+
   if (!album) {
     notFound()
   }

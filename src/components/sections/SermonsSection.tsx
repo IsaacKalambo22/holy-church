@@ -6,6 +6,7 @@ import { Play, ArrowRight, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { getVideoThumbnail } from '@/lib/video'
 
 interface SermonItem {
   id: string
@@ -13,6 +14,7 @@ interface SermonItem {
   title: string
   series?: string | null
   thumbnailUrl?: string | null
+  videoUrl?: string | null
   date?: string | null
   preacher?: { name: string } | null
 }
@@ -60,10 +62,10 @@ export function SermonsSection({ sermons = [] }: { sermons?: SermonItem[] }) {
                 <Link href={sermon.slug ? `/sermons/${sermon.slug}` : '/sermons'}>
                   <Card className="group overflow-hidden cursor-pointer h-full">
                     <div className="relative h-52 gradient-hero overflow-hidden">
-                      {sermon.thumbnailUrl && (
+                      {(sermon.thumbnailUrl || getVideoThumbnail(sermon.videoUrl)) && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={sermon.thumbnailUrl}
+                          src={sermon.thumbnailUrl || getVideoThumbnail(sermon.videoUrl) || ''}
                           alt={sermon.title}
                           className="absolute inset-0 h-full w-full object-cover"
                         />

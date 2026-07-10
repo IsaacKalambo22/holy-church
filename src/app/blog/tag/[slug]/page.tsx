@@ -45,9 +45,10 @@ async function getBlogPosts(page: string = '1') {
   return response.json()
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const tag = await getTag(params.slug)
-  
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const tag = await getTag(slug)
+
   if (!tag) {
     return {
       title: 'Tag Not Found',
@@ -64,11 +65,12 @@ export default async function TagPage({
   params,
   searchParams,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
   searchParams: Promise<{ page?: string }>
 }) {
-  const tag = await getTag(params.slug)
-  
+  const { slug } = await params
+  const tag = await getTag(slug)
+
   if (!tag) {
     notFound()
   }
@@ -117,7 +119,7 @@ export default async function TagPage({
               <div className="flex justify-center gap-2 mt-10">
                 {page > 1 && (
                   <Button variant="outline" asChild>
-                    <Link href={`/blog/tag/${params.slug}?page=${Number(page) - 1}`}>Previous</Link>
+                    <Link href={`/blog/tag/${slug}?page=${Number(page) - 1}`}>Previous</Link>
                   </Button>
                 )}
                 <span className="flex items-center px-4 text-sm text-muted-foreground">
@@ -125,7 +127,7 @@ export default async function TagPage({
                 </span>
                 {page < totalPages && (
                   <Button variant="outline" asChild>
-                    <Link href={`/blog/tag/${params.slug}?page=${Number(page) + 1}`}>Next</Link>
+                    <Link href={`/blog/tag/${slug}?page=${Number(page) + 1}`}>Next</Link>
                   </Button>
                 )}
               </div>

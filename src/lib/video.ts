@@ -33,6 +33,21 @@ function vimeoId(url: URL): string | null {
   return null
 }
 
+// Best-effort poster image derived from a video link, used when no explicit
+// thumbnail was uploaded. YouTube exposes a predictable thumbnail URL; Vimeo
+// and direct files need an API/none, so we return null for those.
+export function getVideoThumbnail(raw?: string | null): string | null {
+  if (!raw) return null
+  let url: URL
+  try {
+    url = new URL(raw.trim())
+  } catch {
+    return null
+  }
+  const id = youTubeId(url)
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null
+}
+
 export function getVideoEmbed(raw?: string | null): VideoEmbed {
   if (!raw) return null
   const value = raw.trim()

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Play, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getVideoThumbnail } from '@/lib/video'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
@@ -25,6 +26,7 @@ interface SermonCardProps extends VariantProps<typeof sermonCardVariants> {
   duration?: string
   date?: string
   thumbnailUrl?: string | null
+  videoUrl?: string | null
   gradient?: string
   actions?: ReactNode
   className?: string
@@ -37,17 +39,21 @@ export function SermonCard({
   duration,
   date,
   thumbnailUrl,
+  videoUrl,
   gradient = 'from-purple-500 to-indigo-600',
   actions,
   size,
   className,
 }: SermonCardProps) {
+  // Prefer an uploaded thumbnail; otherwise fall back to the video's own poster
+  // (e.g. the YouTube frame) so cards aren't just a bare play icon.
+  const poster = thumbnailUrl || getVideoThumbnail(videoUrl)
   return (
     <Card className={cn(sermonCardVariants({ size }), className)}>
       {/* Thumbnail */}
       <div className={`relative h-48 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-        {thumbnailUrl ? (
-          <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover" />
+        {poster ? (
+          <img src={poster} alt={title} className="w-full h-full object-cover" />
         ) : null}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center group-hover:scale-110 transition-transform">

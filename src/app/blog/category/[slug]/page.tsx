@@ -46,9 +46,10 @@ async function getBlogPosts(categoryId: string, page: string = '1') {
   return response.json()
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const category = await getCategory(params.slug)
-  
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const category = await getCategory(slug)
+
   if (!category) {
     return {
       title: 'Category Not Found',
@@ -65,11 +66,12 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
   searchParams: Promise<{ page?: string }>
 }) {
-  const category = await getCategory(params.slug)
-  
+  const { slug } = await params
+  const category = await getCategory(slug)
+
   if (!category) {
     notFound()
   }
@@ -120,7 +122,7 @@ export default async function CategoryPage({
               <div className="flex justify-center gap-2 mt-10">
                 {page > 1 && (
                   <Button variant="outline" asChild>
-                    <Link href={`/blog/category/${params.slug}?page=${Number(page) - 1}`}>Previous</Link>
+                    <Link href={`/blog/category/${slug}?page=${Number(page) - 1}`}>Previous</Link>
                   </Button>
                 )}
                 <span className="flex items-center px-4 text-sm text-muted-foreground">
@@ -128,7 +130,7 @@ export default async function CategoryPage({
                 </span>
                 {page < totalPages && (
                   <Button variant="outline" asChild>
-                    <Link href={`/blog/category/${params.slug}?page=${Number(page) + 1}`}>Next</Link>
+                    <Link href={`/blog/category/${slug}?page=${Number(page) + 1}`}>Next</Link>
                   </Button>
                 )}
               </div>

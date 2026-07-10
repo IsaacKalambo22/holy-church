@@ -143,7 +143,7 @@ export default async function SermonsPage({
         {sermons.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sermons.map((sermon: { id: string; slug: string; title: string; preacher?: { name: string } | null; series?: string | null; date: string; thumbnailUrl?: string | null }) => (
+              {sermons.map((sermon: { id: string; slug: string; title: string; preacher?: { name: string } | null; series?: string | null; date: string; thumbnailUrl?: string | null; videoUrl?: string | null }) => (
                 <Link key={sermon.id} href={`/sermons/${sermon.slug}`}>
                   <SermonCard
                     title={sermon.title}
@@ -151,6 +151,7 @@ export default async function SermonsPage({
                     series={sermon.series || undefined}
                     date={new Date(sermon.date).toLocaleDateString()}
                     thumbnailUrl={sermon.thumbnailUrl}
+                    videoUrl={sermon.videoUrl}
                   />
                 </Link>
               ))}
