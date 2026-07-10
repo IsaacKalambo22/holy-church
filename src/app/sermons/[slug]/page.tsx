@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { getVideoEmbed } from '@/lib/video'
 
 async function getSermon(slug: string) {
   const headersList = await headers()
@@ -76,6 +77,7 @@ export default async function SermonDetailsPage({ params }: { params: { slug: st
   }
 
   const relatedSermons = await getRelatedSermons(sermon.id, sermon.series || undefined)
+  const videoEmbed = getVideoEmbed(sermon.videoUrl)
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,9 +115,17 @@ export default async function SermonDetailsPage({ params }: { params: { slug: st
             {/* Video Player */}
             <Card className="overflow-hidden">
               <div className="aspect-video bg-black flex items-center justify-center">
-                {sermon.videoUrl ? (
+                {videoEmbed?.kind === 'iframe' ? (
+                  <iframe
+                    src={videoEmbed.src}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={sermon.title}
+                  />
+                ) : videoEmbed?.kind === 'file' ? (
                   <video
-                    src={sermon.videoUrl}
+                    src={videoEmbed.src}
                     controls
                     className="w-full h-full"
                     poster={sermon.thumbnailUrl || undefined}

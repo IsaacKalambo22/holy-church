@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Plus, Pencil, Trash2, X, Loader2, Inbox, Upload, Film } from 'lucide-react'
+import { getVideoEmbed } from '@/lib/video'
 
 export type Item = Record<string, unknown>
 
@@ -23,6 +24,7 @@ export interface Field {
     | 'stringlist'
     | 'image'
     | 'video'
+    | 'videourl'
     | 'audio'
     | 'imagelist'
   options?: { value: string; label: string }[]
@@ -101,6 +103,54 @@ function FileField({
         )}
       </div>
       {err && <p className="text-xs text-destructive">{err}</p>}
+    </div>
+  )
+}
+
+function VideoUrlField({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string
+  onChange: (url: string) => void
+  placeholder?: string
+}) {
+  const embed = getVideoEmbed(value)
+  const trimmed = value.trim()
+  const invalid = trimmed !== '' && !embed
+
+  return (
+    <div className="space-y-2">
+      <Input
+        type="url"
+        inputMode="url"
+        value={value}
+        placeholder={placeholder || 'https://youtube.com/watch?v=… or https://vimeo.com/…'}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {embed?.kind === 'iframe' && (
+        <div className="aspect-video overflow-hidden rounded-lg border border-border">
+          <iframe
+            src={embed.src}
+            className="h-full w-full"
+            allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+            title="Video preview"
+          />
+        </div>
+      )}
+      {embed?.kind === 'file' && (
+        <div className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground">
+          <Film className="h-4 w-4" />
+          <span>Direct video file link — will play inline.</span>
+        </div>
+      )}
+      {invalid && (
+        <p className="text-xs text-destructive">
+          Enter a valid YouTube or Vimeo link (or a direct video file URL).
+        </p>
+      )}
     </div>
   )
 }
@@ -485,6 +535,12 @@ export function ResourceManager({
                     <FileField
                       type={f.type}
                       value={String(form[f.name] ?? '')}
+                      onChange={(url) => setForm((s) => ({ ...s, [f.name]: url }))}
+                    />
+                  ) : f.type === 'videourl' ? (
+                    <VideoUrlField
+                      value={String(form[f.name] ?? '')}
+                      placeholder={f.placeholder}
                       onChange={(url) => setForm((s) => ({ ...s, [f.name]: url }))}
                     />
                   ) : f.type === 'imagelist' ? (

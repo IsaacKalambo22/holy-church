@@ -18,7 +18,12 @@ const fields: Field[] = [
   { name: 'description', label: 'Description', type: 'textarea' },
   { name: 'date', label: 'Date', type: 'date' },
   { name: 'thumbnailUrl', label: 'Thumbnail', type: 'image' },
-  { name: 'videoUrl', label: 'Video', type: 'video' },
+  {
+    name: 'videoUrl',
+    label: 'Video',
+    type: 'videourl',
+    help: 'Paste a YouTube or Vimeo link. Upload the video there (free, unlimited) and paste the share URL here — we embed the player, so it costs no storage.',
+  },
   { name: 'audioUrl', label: 'Audio', type: 'audio' },
   { name: 'published', label: 'Published', type: 'checkbox' },
 ]
