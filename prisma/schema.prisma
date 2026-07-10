@@ -358,6 +358,7 @@ model Course {
   category    String?   // Learning track/level, e.g. "Beginners", "Ministers"
   imageUrl    String?
   published   Boolean   @default(false)
+  views       Int       @default(0)
   lessons     Lesson[]
   deletedAt   DateTime? @db.Timestamptz
   createdAt   DateTime  @default(now()) @db.Timestamptz
@@ -379,6 +380,7 @@ model Lesson {
   videoUrl    String?
   order       Int       @default(0)
   published   Boolean   @default(true)
+  views       Int       @default(0)
   deletedAt   DateTime? @db.Timestamptz
   createdAt   DateTime  @default(now()) @db.Timestamptz
   updatedAt   DateTime  @updatedAt @db.Timestamptz

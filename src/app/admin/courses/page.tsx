@@ -8,6 +8,7 @@ const columns: Column[] = [
   { key: 'title', label: 'Title' },
   { key: 'category', label: 'Track' },
   { key: 'lessonCount', label: 'Lessons' },
+  { key: 'views', label: 'Views' },
   { key: 'published', label: 'Status', render: publishedPill },
 ]
 

@@ -76,6 +76,11 @@ export const courseRoutes = new Elysia({ prefix: '/courses' })
     }
     return { success: true, data: course }
   })
+  // Public: bump the view counter. Fire-and-forget from the course detail page.
+  .post('/:id/views', async ({ params }) => {
+    await prisma.course.update({ where: { id: params.id }, data: { views: { increment: 1 } } })
+    return { success: true }
+  })
   .use(contentGuard)
   .post(
     '/',
@@ -157,6 +162,11 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
       include: { course: { select: { id: true, title: true } } },
     })
     return { success: true, data: lessons }
+  })
+  // Public: bump a lesson's view counter when it's played in the course viewer.
+  .post('/:id/views', async ({ params }) => {
+    await prisma.lesson.update({ where: { id: params.id }, data: { views: { increment: 1 } } })
+    return { success: true }
   })
   .use(contentGuard)
   .post(

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getVideoEmbed, getVideoThumbnail } from '@/lib/video'
+import { ViewTracker } from '@/components/shared/ViewTracker'
 
 async function getSermon(slug: string) {
   const headersList = await headers()
@@ -83,6 +84,7 @@ export default async function SermonDetailsPage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-background">
+      <ViewTracker endpoint={`/api/sermons/${sermon.id}/views`} dedupeKey={`sermon-${sermon.id}`} />
       {/* Hero Section */}
       <div className="gradient-hero py-16 px-4">
         <div className="max-w-7xl mx-auto">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PlayCircle, CheckCircle2, Circle } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -19,6 +19,18 @@ export function CourseView({ lessons }: { lessons: CourseLesson[] }) {
   const [activeId, setActiveId] = useState(lessons[0]?.id)
   const active = lessons.find((l) => l.id === activeId) || lessons[0]
   const embed = getVideoEmbed(active?.videoUrl)
+
+  // Count a lesson view once per browser session when it becomes the active
+  // lesson (initial load or when the viewer switches lessons).
+  useEffect(() => {
+    if (!active?.id) return
+    const key = `viewed:lesson-${active.id}`
+    if (sessionStorage.getItem(key)) return
+    sessionStorage.setItem(key, '1')
+    fetch(`/api/lessons/${active.id}/views`, { method: 'POST' }).catch(() => {
+      sessionStorage.removeItem(key)
+    })
+  }, [active?.id])
 
   if (!active) {
     return (

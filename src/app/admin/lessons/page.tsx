@@ -17,6 +17,7 @@ const columns: Column[] = [
       return course?.title || '—'
     },
   },
+  { key: 'views', label: 'Views' },
   { key: 'published', label: 'Status', render: publishedPill },
 ]
 

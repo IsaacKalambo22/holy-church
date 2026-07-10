@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Eye } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { CourseView, type CourseLesson } from '@/components/lessons/CourseView'
+import { ViewTracker } from '@/components/shared/ViewTracker'
 
 interface Course {
   id: string
@@ -12,6 +13,7 @@ interface Course {
   title: string
   description?: string | null
   category?: string | null
+  views?: number
   lessons: CourseLesson[]
 }
 
@@ -51,6 +53,7 @@ export default async function CourseDetailPage({
 
   return (
     <div className="min-h-screen bg-background">
+      <ViewTracker endpoint={`/api/courses/${course.id}/views`} dedupeKey={`course-${course.id}`} />
       <div className="max-w-7xl mx-auto px-4 py-10">
         <Link
           href="/lessons"
@@ -66,6 +69,11 @@ export default async function CourseDetailPage({
           <h1 className="font-heading text-4xl font-bold text-foreground">{course.title}</h1>
           {course.description && (
             <p className="text-muted-foreground text-lg mt-3 max-w-3xl">{course.description}</p>
+          )}
+          {typeof course.views === 'number' && (
+            <p className="mt-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Eye className="h-4 w-4" /> {course.views.toLocaleString()} {course.views === 1 ? 'view' : 'views'}
+            </p>
           )}
         </div>
 
