@@ -33,6 +33,17 @@ export interface Field {
   help?: string
 }
 
+// Turn a title/name into a clean, URL-safe slug: lowercase, accents stripped,
+// non-alphanumerics collapsed to single hyphens, no leading/trailing hyphens.
+export function slugify(input: string): string {
+  return input
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 async function uploadFile(file: File): Promise<string> {
   const fd = new FormData()
   fd.append('file', file)
@@ -257,6 +268,12 @@ export function ResourceManager({
   const [form, setForm] = useState<Record<string, unknown>>({})
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
+  // Whether the user has hand-edited the slug; once they do, we stop
+  // auto-deriving it from the title so we don't clobber their choice.
+  const [slugTouched, setSlugTouched] = useState(false)
+
+  const hasSlugField = fields.some((f) => f.name === 'slug')
+  const slugSource = fields.find((f) => f.name === 'title') || fields.find((f) => f.name === 'name')
 
   // Stable key so a fresh listParams object literal each render doesn't reload.
   const listKey = JSON.stringify(listParams || {})
@@ -289,6 +306,7 @@ export function ResourceManager({
     setForm(initial)
     setEditing(null)
     setFormError('')
+    setSlugTouched(false)
     setDialogOpen(true)
   }
 
@@ -305,7 +323,22 @@ export function ResourceManager({
     setForm(initial)
     setEditing(item)
     setFormError('')
+    // Existing records already have a slug (their live URL) — never auto-rewrite it.
+    setSlugTouched(true)
     setDialogOpen(true)
+  }
+
+  // Text-input change handler that also auto-fills the slug from the title/name
+  // on new records until the user edits the slug themselves.
+  const handleTextChange = (field: Field, value: string) => {
+    setForm((s) => {
+      const next = { ...s, [field.name]: value }
+      if (!editing && !slugTouched && hasSlugField && slugSource && field.name === slugSource.name) {
+        next.slug = slugify(value)
+      }
+      return next
+    })
+    if (field.name === 'slug') setSlugTouched(true)
   }
 
   const submit = async () => {
@@ -561,7 +594,7 @@ export function ResourceManager({
                       type={f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : 'text'}
                       value={String(form[f.name] ?? '')}
                       placeholder={f.placeholder}
-                      onChange={(e) => setForm((s) => ({ ...s, [f.name]: e.target.value }))}
+                      onChange={(e) => handleTextChange(f, e.target.value)}
                     />
                   )}
                   {f.help && <p className="text-xs text-muted-foreground">{f.help}</p>}
